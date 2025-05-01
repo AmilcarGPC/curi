@@ -1,0 +1,338 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base colors */
+    --background: 0 0% 100%;
+    --foreground: 224 71% 4%;
+
+    /* Custom school-themed palette */
+    --primary: 205 100% 50%;
+    /* Bright blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 25 95% 53%;
+    /* Warm orange */
+    --secondary-foreground: 0 0% 100%;
+    --accent: 262 83% 58%;
+    /* Purple */
+    --accent-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    /* Green */
+    --warning: 38 92% 50%;
+    /* Amber */
+    --danger: 0 91% 71%;
+    /* Red */
+
+    /* UI elements */
+    --card: 0 0% 100%;
+    --card-foreground: 224 71% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 4%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 8% 46%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 205 100% 50%;
+
+    /* Sidebar specific */
+    --sidebar-background: 210 20% 98%;
+    --sidebar-foreground: 224 71% 4%;
+    --sidebar-accent: 205 100% 50%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 205 100% 50%;
+
+    /* Misc */
+    --radius: 0.5rem;
+
+    /* Report card specific */
+    --report-background: 0 0% 100%;
+    --report-header: 205 100% 97%;
+    --report-border: 220 13% 91%;
+    --report-text: 224 71% 4%;
+    --report-accent: 205 100% 50%;
+
+    /* Animation speeds */
+    --transition-fast: 150ms;
+    --transition-medium: 300ms;
+    --transition-slow: 500ms;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 210 20% 98%;
+
+    /* Custom school-themed palette - dark mode */
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 25 70% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 262 60% 52%;
+    --accent-foreground: 0 0% 100%;
+    --success: 142 60% 39%;
+    --warning: 38 92% 50%;
+    --danger: 0 70% 60%;
+
+    /* UI elements */
+    --card: 224 71% 4%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 20% 98%;
+    --muted: 215 27% 16%;
+    --muted-foreground: 217 10% 64%;
+    --border: 215 27% 16%;
+    --input: 215 27% 16%;
+    --ring: 199 89% 48%;
+
+    /* Sidebar specific */
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-accent: 199 89% 48%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 215 27% 16%;
+    --sidebar-ring: 199 89% 48%;
+
+    /* Report card specific */
+    --report-background: 224 71% 4%;
+    --report-header: 215 27% 16%;
+    --report-border: 215 27% 16%;
+    --report-text: 210 20% 98%;
+    --report-accent: 199 89% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes pageFlip {
+  0% {
+    transform: rotateY(0deg);
+  }
+
+  100% {
+    transform: rotateY(-180deg);
+  }
+}
+
+/* Animation classes */
+.animate-fade-in {
+  animation: fadeIn var(--transition-medium) ease-in-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight var(--transition-medium) ease-out;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp var(--transition-medium) ease-out;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s infinite;
+}
+
+.animate-page-flip {
+  animation: pageFlip var(--transition-slow) ease-in-out;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* Custom utility classes */
+.page-transition-wrapper {
+  @apply animate-fade-in;
+}
+
+/* Interactive element enhancements */
+.btn-hover-effect {
+  @apply transition-all duration-300;
+}
+
+.btn-hover-effect:hover {
+  @apply transform scale-105;
+}
+
+.btn-hover-effect:active {
+  @apply transform scale-95;
+}
+
+/* Focus styles for accessibility */
+.focus-visible-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+}
+
+/* Print styles for report cards */
+@media print {
+  .print-only {
+    display: block !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    font-size: 12pt;
+    color: black;
+  }
+
+  .report-card {
+    page-break-after: always;
+    margin: 0;
+    padding: 1cm;
+    border: none;
+    box-shadow: none;
+    width: 100%;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.7);
+}
+
+/* Custom card styles */
+.card-highlight {
+  @apply border-l-4 border-primary;
+}
+
+/* Badge styles */
+@layer components {
+  .badge-regular {
+    @apply bg-success bg-opacity-20 text-success font-medium px-2 py-0.5 rounded-md text-xs;
+  }
+
+  .badge-irregular {
+    @apply bg-red-500 bg-opacity-20 text-red-500 font-medium px-2 py-0.5 rounded-md text-xs;
+  }
+}
+
+/* Table enhancements */
+.table-row-hover {
+  @apply transition-colors hover:bg-muted/50;
+}
+
+/* Report card specific styles */
+.report-card {
+  background-color: hsl(var(--report-background));
+  border: 1px solid hsl(var(--report-border));
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.report-card-header {
+  background-color: hsl(var(--report-header));
+  padding: 1rem;
+  border-bottom: 1px solid hsl(var(--report-border));
+}
+
+.report-card-body {
+  padding: 1rem;
+}
+
+.report-card-footer {
+  padding: 1rem;
+  border-top: 1px solid hsl(var(--report-border));
+}
+
+.report-card-grade {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.125rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+}
+
+.grade-a {
+  background-color: hsl(var(--success) / 0.2);
+  color: hsl(var(--success));
+}
+
+.grade-b {
+  background-color: hsl(var(--primary) / 0.2);
+  color: hsl(var(--primary));
+}
+
+.grade-c {
+  background-color: hsl(var(--warning) / 0.2);
+  color: hsl(var(--warning));
+}
+
+.grade-d,
+.grade-f {
+  background-color: hsl(var(--danger) / 0.2);
+  color: hsl(var(--danger));
+}
