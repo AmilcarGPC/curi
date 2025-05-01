@@ -4,6 +4,7 @@ const calificacionSchema = Joi.object({
   alumno_id: Joi.string().uuid().required(),
   asignatura_id: Joi.string().uuid().required(),
   calificacion: Joi.number().integer().min(0).max(100).required(),
+  periodo: Joi.number().integer().min(1).max(3).required(),
 });
 
 function validarCalificacion(req, res, next) {

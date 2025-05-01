@@ -46,10 +46,21 @@ async function eliminarAsignatura(req, res) {
   }
 }
 
+// Obtener promedios y alumnos inscritos del último periodo para cada asignatura
+async function obtenerPromediosUltimoPeriodo(req, res) {
+  try {
+    const resultados = await asignaturasService.obtenerPromediosUltimoPeriodo();
+    res.json(resultados);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   crearAsignatura,
   obtenerAsignaturas,
   obtenerAsignaturaPorId,
   actualizarAsignatura,
   eliminarAsignatura,
+  obtenerPromediosUltimoPeriodo,
 };

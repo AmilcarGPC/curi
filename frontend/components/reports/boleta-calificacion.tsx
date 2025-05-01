@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { motion, AnimatePresence } from "framer-motion"
@@ -8,24 +8,208 @@ import { Printer, Download, ChevronLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
 
 // Sample student data
-const students = [
-  { id: "STU001", name: "Alex Chen", grade: "3er Grado" },
-  { id: "STU002", name: "Emma Wilson", grade: "4to Grado" },
-  { id: "STU003", name: "Olivia Martinez", grade: "2do Grado" },
+const periodos = [
+  { value: "1", label: "1er Trimestre" },
+  { value: "2", label: "2do Trimestre" },
+  { value: "3", label: "3er Trimestre" },
+  { value: "final", label: "Final del Curso" },
 ]
 
-// Sample subject data
-const subjects = [
-  { id: "SUB001", name: "Matemáticas", grade: "A", score: 92 },
-  { id: "SUB002", name: "Ciencias", grade: "B+", score: 88 },
-  { id: "SUB003", name: "Inglés", grade: "A-", score: 90 },
-  { id: "SUB004", name: "Historia", grade: "B", score: 85 },
-  { id: "SUB005", name: "Arte", grade: "A+", score: 98 },
-  { id: "SUB006", name: "Educación Física", grade: "A", score: 95 },
-]
+// Utilidad para obtener el dominio y color según la calificación
+function getDominio(score) {
+  if (typeof score !== "number") return { label: "En espera", color: "gray" }
+  if (score >= 90) return { label: "Sobresaliente", color: "green" }
+  if (score >= 80) return { label: "Satisfactorio", color: "blue" }
+  if (score >= 60) return { label: "Suficiente", color: "yellow" }
+  return { label: "No acreditado", color: "red" }
+}
+
+// Utilidad para mostrar el grado como texto
+function gradoToTexto(grado: number) {
+  switch (grado) {
+    case 1:
+      return "1er Grado"
+    case 2:
+      return "2do Grado"
+    case 3:
+      return "3er Grado"
+    case 4:
+      return "4to Grado"
+    case 5:
+      return "5to Grado"
+    case 6:
+      return "6to Grado"
+    default:
+      return grado
+  }
+}
+
+function PeriodoHeader({ selectedPeriodo }: { selectedPeriodo: string }) {
+  const periodoLabel = periodos.find((p) => p.value === selectedPeriodo)?.label || "Periodo"
+  return (
+    <div className="text-right">
+      <p className="font-medium">Boleta de Calificación</p>
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={selectedPeriodo}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.25 }}
+          className="text-sm text-muted-foreground"
+        >
+          {periodoLabel}
+        </motion.p>
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function DesempenoAcademico({
+  selectedPeriodo,
+  grades,
+  subjects,
+  getDominio,
+  getPeriodoPromedio,
+  getPromedioFinal,
+}: any) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={selectedPeriodo}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.25 }}
+      >
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-4">Desempeño Académico</h3>
+          {selectedPeriodo !== "final" ? (
+            <>
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    <th className="py-2 px-4 text-left">Asignatura</th>
+                    <th className="py-2 px-4 text-center">Dominio</th>
+                    <th className="py-2 px-4 text-center">Calificación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {subjects.map((subject: any) => {
+                    const score = grades[selectedPeriodo]?.[subject.id]
+                    const dominio = getDominio(score)
+                    return (
+                      <tr key={subject.id} className="border-b">
+                        <td className="py-3 px-4">{subject.name}</td>
+                        <td className="py-3 px-4 text-center">
+                          <span
+                            className={`inline-block font-semibold px-3 py-1 rounded-full bg-opacity-20 grade-${dominio.color}`}
+                            style={{
+                              backgroundColor:
+                                dominio.color === "green"
+                                  ? "#22c55e33"
+                                  : dominio.color === "blue"
+                                  ? "#3b82f633"
+                                  : dominio.color === "yellow"
+                                  ? "#eab30833"
+                                  : dominio.color === "red"
+                                  ? "#ef444433"
+                                  : "#d1d5db",
+                              color:
+                                dominio.color === "green"
+                                  ? "#15803d"
+                                  : dominio.color === "blue"
+                                  ? "#1d4ed8"
+                                  : dominio.color === "yellow"
+                                  ? "#b45309"
+                                  : dominio.color === "red"
+                                  ? "#b91c1c"
+                                  : "#6b7280",
+                            }}
+                          >
+                            {dominio.label}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-center">{typeof score === "number" ? score : "—"}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+              <div className="mt-4 text-right">
+                <span className="font-semibold">Promedio del periodo: </span>
+                {getPeriodoPromedio(selectedPeriodo) ?? "—"}
+              </div>
+            </>
+          ) : (
+            <>
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    <th className="py-2 px-4 text-left">Asignatura</th>
+                    <th className="py-2 px-4 text-center">1er Trim.</th>
+                    <th className="py-2 px-4 text-center">2do Trim.</th>
+                    <th className="py-2 px-4 text-center">3er Trim.</th>
+                    <th className="py-2 px-4 text-center">Promedio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {subjects.map((subject: any) => {
+                    const s1 = grades["1"]?.[subject.id]
+                    const s2 = grades["2"]?.[subject.id]
+                    const s3 = grades["3"]?.[subject.id]
+                    const califs = [s1, s2, s3].filter((v) => typeof v === "number")
+                    const prom = califs.length ? Math.round(califs.reduce((a, b) => a + b, 0) / califs.length) : null
+                    return (
+                      <tr key={subject.id} className="border-b">
+                        <td className="py-3 px-4">{subject.name}</td>
+                        <td className="py-3 px-4 text-center">{typeof s1 === "number" ? s1 : "—"}</td>
+                        <td className="py-3 px-4 text-center">{typeof s2 === "number" ? s2 : "—"}</td>
+                        <td className="py-3 px-4 text-center">{typeof s3 === "number" ? s3 : "—"}</td>
+                        <td className="py-3 px-4 text-center">{prom ?? "—"}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+              <div className="mt-4 text-right">
+                <span className="font-semibold">Promedio final del curso: </span>
+                {getPromedioFinal() ?? "—"}
+              </div>
+            </>
+          )}
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  )
+}
 
 export function BoletaCalificacion() {
-  const [selectedStudent, setSelectedStudent] = useState<string>("STU001")
+  const [selectedStudent, setSelectedStudent] = useState<string>("")
+  const [selectedPeriodo, setSelectedPeriodo] = useState<string>("1")
+  const [boleta, setBoleta] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+
+  // Fetch students for select
+  const [students, setStudents] = useState<any[]>([])
+  useEffect(() => {
+    fetch("http://localhost:4000/api/alumnos")
+      .then((res) => res.json())
+      .then((data) => setStudents(data))
+      .catch(() => setStudents([]))
+  }, [])
+
+  // Fetch boleta when student or periodo changes
+  useEffect(() => {
+    if (!selectedStudent) return
+    setLoading(true)
+    fetch(`http://localhost:4000/api/reportes/boleta/${selectedStudent}?periodo=${selectedPeriodo}`)
+      .then((res) => res.json())
+      .then((data) => setBoleta(data))
+      .catch(() => setBoleta(null))
+      .finally(() => setLoading(false))
+  }, [selectedStudent, selectedPeriodo])
+
   const [isFlipping, setIsFlipping] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
   const totalPages = 2
@@ -42,7 +226,22 @@ export function BoletaCalificacion() {
     }, 300)
   }
 
-  const student = students.find((s) => s.id === selectedStudent)
+  // Calcular promedio del periodo
+  function getPeriodoPromedio(periodo: string) {
+    const califs = Object.values(boleta?.calificaciones?.[periodo] || {}).filter((v) => typeof v === "number")
+    if (!califs.length) return null
+    return Math.round(califs.reduce((a, b) => a + b, 0) / califs.length)
+  }
+
+  // Calcular promedio final del curso
+  function getPromedioFinal() {
+    let sum = 0, count = 0
+    for (const p of ["1", "2", "3"]) {
+      const prom = getPeriodoPromedio(p)
+      if (prom !== null) { sum += prom; count++ }
+    }
+    return count ? Math.round(sum / count) : null
+  }
 
   return (
     <div className="space-y-6">
@@ -55,8 +254,18 @@ export function BoletaCalificacion() {
             <SelectContent>
               {students.map((student) => (
                 <SelectItem key={student.id} value={student.id}>
-                  {student.name}
+                  {student.nombre}
                 </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={selectedPeriodo} onValueChange={setSelectedPeriodo}>
+            <SelectTrigger className="w-[180px] focus-visible-ring">
+              <SelectValue placeholder="Selecciona periodo" />
+            </SelectTrigger>
+            <SelectContent>
+              {periodos.map((p) => (
+                <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -75,156 +284,81 @@ export function BoletaCalificacion() {
       </div>
 
       <div className="flex justify-center">
-        <div className="w-full max-w-3xl perspective-1000">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentPage}
-              initial={{ rotateY: isFlipping ? -90 : 0, opacity: 0 }}
-              animate={{ rotateY: 0, opacity: 1 }}
-              exit={{ rotateY: 90, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="report-card"
-            >
-              {currentPage === 0 ? (
-                <div className="report-card-content">
-                  <div className="report-card-header flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Image
-                        src="/placeholder.svg?height=60&width=60"
-                        alt="School Logo"
-                        width={60}
-                        height={60}
-                        className="rounded-md"
-                      />
+        <div className="w-full max-w-3xl perspective-1000 report-card">
+          {loading ? (
+            <div className="report-card-content flex items-center justify-center min-h-[300px]">
+              <p className="text-muted-foreground">Cargando boleta...</p>
+            </div>
+          ) : boleta ? (
+            currentPage === 0 ? (
+              <div className="report-card-content">
+                <div className="report-card-header flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Image
+                      src="/placeholder.svg?height=60&width=60"
+                      alt="School Logo"
+                      width={60}
+                      height={60}
+                      className="rounded-md"
+                    />
+                    <div>
+                      <h2 className="text-2xl font-bold">Primaria</h2>
+                      <p className="text-sm text-muted-foreground">Ciclo Escolar 2023-2024</p>
+                    </div>
+                  </div>
+                  <PeriodoHeader selectedPeriodo={selectedPeriodo} />
+                </div>
+                <div className="report-card-body">
+                  <div className="mb-6 p-4 bg-muted/30 rounded-md">
+                    <h3 className="text-lg font-semibold mb-2">Información del Estudiante</h3>
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <h2 className="text-2xl font-bold">Primaria</h2>
-                        <p className="text-sm text-muted-foreground">Ciclo Escolar 2023-2024</p>
+                        <p className="text-sm text-muted-foreground">Nombre</p>
+                        <p className="font-medium">{boleta.alumno?.nombre}</p>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">Boleta de Calificación</p>
-                      <p className="text-sm text-muted-foreground">Primer Semestre</p>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Grado</p>
+                        <p className="font-medium">{gradoToTexto(boleta.alumno?.grado)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Matrícula</p>
+                        <p className="font-medium">{boleta.alumno?.matricula}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Correo</p>
+                        <p className="font-medium">{boleta.alumno?.correo}</p>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="report-card-body">
-                    <div className="mb-6 p-4 bg-muted/30 rounded-md">
-                      <h3 className="text-lg font-semibold mb-2">Información del Estudiante</h3>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Nombre</p>
-                          <p className="font-medium">{student?.name}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Grado</p>
-                          <p className="font-medium">{student?.grade}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Matrícula</p>
-                          <p className="font-medium">{student?.id}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Periodo</p>
-                          <p className="font-medium">Enero - Junio 2023</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold mb-4">Desempeño Académico</h3>
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="py-2 px-4 text-left">Asignatura</th>
-                            <th className="py-2 px-4 text-center">Calificación</th>
-                            <th className="py-2 px-4 text-center">Puntaje</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {subjects.map((subject) => (
-                            <tr key={subject.id} className="border-b">
-                              <td className="py-3 px-4">{subject.name}</td>
-                              <td className="py-3 px-4 text-center">
-                                <span className={`report-card-grade grade-${subject.grade.charAt(0).toLowerCase()}`}>
-                                  {subject.grade}
-                                </span>
-                              </td>
-                              <td className="py-3 px-4 text-center">{subject.score}/100</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                  <DesempenoAcademico
+                    selectedPeriodo={selectedPeriodo}
+                    grades={boleta.calificaciones}
+                    subjects={boleta.asignaturas}
+                    getDominio={getDominio}
+                    getPeriodoPromedio={getPeriodoPromedio}
+                    getPromedioFinal={getPromedioFinal}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="report-card-content">
+                <div className="report-card-header">
+                  <h2 className="text-xl font-bold">Observaciones</h2>
+                </div>
+                <div className="report-card-body flex flex-col items-center justify-center min-h-[300px]">
+                  <div className="text-center text-muted-foreground">
+                    <p className="text-lg font-semibold mb-2">Sin observaciones adicionales</p>
+                    <p className="text-sm">No se han registrado comentarios, áreas de mejora ni firmas para este periodo.</p>
+                    <div className="mt-6 text-5xl">📝</div>
                   </div>
                 </div>
-              ) : (
-                <div className="report-card-content">
-                  <div className="report-card-header">
-                    <h2 className="text-xl font-bold">Comentarios y Asistencia</h2>
-                  </div>
-
-                  <div className="report-card-body">
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold mb-2">Comentarios del Docente</h3>
-                      <div className="p-4 border rounded-md">
-                        <p className="italic">
-                          {student?.name} ha mostrado un excelente progreso este semestre. Su participación en las discusiones de clase ha sido sobresaliente y demuestra constantemente una gran ética de trabajo. Continúa enfocándote en la gestión del tiempo para las tareas.
-                        </p>
-                        <div className="mt-4 text-right">
-                          <p className="font-medium">Mtra. Johnson</p>
-                          <p className="text-sm text-muted-foreground">Docente Titular</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold mb-2">Resumen de Asistencia</h3>
-                      <div className="grid grid-cols-2 gap-4 p-4 border rounded-md">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Días Escolares</p>
-                          <p className="font-medium">92</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Asistencias</p>
-                          <p className="font-medium">89 (97%)</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Faltas</p>
-                          <p className="font-medium">3 (3%)</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Retardos</p>
-                          <p className="font-medium">2</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold mb-2">Áreas de Mejora</h3>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li>Seguir desarrollando habilidades de pensamiento crítico</li>
-                        <li>Practicar la gestión del tiempo para proyectos a largo plazo</li>
-                        <li>Participar más activamente en discusiones grupales</li>
-                      </ul>
-                    </div>
-
-                    <div className="mt-8 pt-4 border-t">
-                      <div className="flex justify-between">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Firma del Padre/Madre o Tutor</p>
-                          <div className="mt-2 h-8 w-40 border-b"></div>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Fecha</p>
-                          <div className="mt-2 h-8 w-40 border-b"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
+              </div>
+            )
+          ) : (
+            <div className="report-card-content flex items-center justify-center min-h-[300px]">
+              <p className="text-muted-foreground">No se pudo cargar la boleta.</p>
+            </div>
+          )}
         </div>
       </div>
 

@@ -9,13 +9,13 @@ export const studentSchema = z.object({
     .string()
     .min(3, { message: "El nombre debe tener al menos 3 caracteres" })
     .max(50, { message: "El nombre no debe exceder 50 caracteres" }),
-  grado: z.string({ required_error: "El grado es obligatorio" }),
-  correoElectronico: z
-    .string({ required_error: "El correo electrónico es obligatorio" })
-    .email({ message: "Ingresa un correo electrónico válido" }),
-  teacher: z.string({ required_error: "El docente es obligatorio" }),
-  averageGrade: z.string().optional(),
-  attendance: z.string().optional(),
+  grado: z
+    .number({ required_error: "El grado es obligatorio" })
+    .min(1, { message: "El grado debe ser entre 1 y 6" })
+    .max(6, { message: "El grado debe ser entre 1 y 6" }),
+  correo: z
+    .string({ required_error: "El correo es obligatorio" })
+    .email({ message: "Ingresa un correo válido" }),
 })
 
 export type StudentFormValues = z.infer<typeof studentSchema>

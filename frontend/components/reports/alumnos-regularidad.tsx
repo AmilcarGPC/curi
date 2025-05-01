@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
@@ -9,65 +9,58 @@ import { Input } from "@/components/ui/input"
 import { motion, AnimatePresence } from "framer-motion"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-// Sample data for students by grade and regularity
-const studentsByGrade = {
-  "1st Grade": {
-    regular: [
-      { id: "STU010", name: "James Taylor", averageGrade: "B+", attendance: "93%" },
-      { id: "STU005", name: "Sophia Williams", averageGrade: "A+", attendance: "99%" },
-      { id: "STU013", name: "Charlotte Brown", averageGrade: "A-", attendance: "97%" },
-      { id: "STU014", name: "William Davis", averageGrade: "B", attendance: "95%" },
-    ],
-    irregular: [{ id: "STU015", name: "Harper Wilson", averageGrade: "C-", attendance: "85%" }],
-  },
-  "2nd Grade": {
-    regular: [
-      { id: "STU003", name: "Olivia Martinez", averageGrade: "A-", attendance: "97%" },
-      { id: "STU008", name: "Ethan Lee", averageGrade: "B+", attendance: "94%" },
-      { id: "STU016", name: "Amelia Johnson", averageGrade: "A", attendance: "96%" },
-    ],
-    irregular: [
-      { id: "STU017", name: "Lucas Garcia", averageGrade: "D+", attendance: "82%" },
-      { id: "STU018", name: "Mia Rodriguez", averageGrade: "C", attendance: "88%" },
-    ],
-  },
-  "3rd Grade": {
-    regular: [
-      { id: "STU001", name: "Alex Chen", averageGrade: "A", attendance: "98%" },
-      { id: "STU006", name: "Liam Garcia", averageGrade: "B-", attendance: "90%" },
-      { id: "STU011", name: "Mia Anderson", averageGrade: "A", attendance: "98%" },
-      { id: "STU019", name: "Henry Thompson", averageGrade: "B+", attendance: "94%" },
-    ],
-    irregular: [{ id: "STU020", name: "Evelyn Martin", averageGrade: "D", attendance: "80%" }],
-  },
-  "4th Grade": {
-    regular: [
-      { id: "STU002", name: "Emma Wilson", averageGrade: "B+", attendance: "95%" },
-      { id: "STU007", name: "Ava Rodriguez", averageGrade: "A", attendance: "96%" },
-      { id: "STU012", name: "Benjamin Martin", averageGrade: "B", attendance: "91%" },
-    ],
-    irregular: [
-      { id: "STU021", name: "Sebastian Clark", averageGrade: "C-", attendance: "84%" },
-      { id: "STU022", name: "Scarlett Lewis", averageGrade: "D+", attendance: "83%" },
-    ],
-  },
-  "5th Grade": {
-    regular: [
-      { id: "STU004", name: "Noah Johnson", averageGrade: "B", attendance: "92%" },
-      { id: "STU009", name: "Isabella Brown", averageGrade: "A-", attendance: "97%" },
-      { id: "STU023", name: "Jackson Moore", averageGrade: "B+", attendance: "93%" },
-    ],
-    irregular: [
-      { id: "STU024", name: "Sofia Taylor", averageGrade: "C", attendance: "86%" },
-      { id: "STU025", name: "Leo Adams", averageGrade: "D", attendance: "81%" },
-    ],
-  },
+// Utilidad para mostrar el grado como texto
+function gradoToTexto(grado: number) {
+  switch (grado) {
+    case 1:
+      return "1er Grado"
+    case 2:
+      return "2do Grado"
+    case 3:
+      return "3er Grado"
+    case 4:
+      return "4to Grado"
+    case 5:
+      return "5to Grado"
+    case 6:
+      return "6to Grado"
+    default:
+      return grado
+  }
 }
 
 export function AlumnosRegularidad() {
+  const [periodo, setPeriodo] = useState("1")
+  const [alumnos, setAlumnos] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
   const [selectedGrade, setSelectedGrade] = useState<string>("all")
   const [searchTerm, setSearchTerm] = useState("")
-  const [expandedGrades, setExpandedGrades] = useState<string[]>(["1st Grade"])
+  const [expandedGrades, setExpandedGrades] = useState<string[]>(["1er Grado"])
+
+  useEffect(() => {
+    setLoading(true)
+    fetch(`http://localhost:4000/api/reportes/alumnos-regularidad?periodo=${periodo}`)
+      .then((res) => res.json())
+      .then(setAlumnos)
+      .catch(() => setAlumnos([]))
+      .finally(() => setLoading(false))
+  }, [periodo])
+
+  // Obtener los grados disponibles
+  const gradesList = Array.from(new Set(alumnos.map((a) => a.grado))).sort()
+
+  // Agrupar alumnos por grado y regularidad
+  const studentsByGrade: Record<string, { regular: any[]; irregular: any[] }> = {}
+  for (const grado of gradesList) {
+    const gradoTxt = gradoToTexto(grado)
+    studentsByGrade[gradoTxt] = { regular: [], irregular: [] }
+    alumnos
+      .filter((a) => a.grado === grado)
+      .forEach((a) => {
+        if (a.regular) studentsByGrade[gradoTxt].regular.push(a)
+        else studentsByGrade[gradoTxt].irregular.push(a)
+      })
+  }
 
   // Get all grades or filter by selected grade
   const getGradesToDisplay = () => {
@@ -83,7 +76,7 @@ export function AlumnosRegularidad() {
     if (!searchTerm) return students
     return students.filter(
       (student) =>
-        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.id.toLowerCase().includes(searchTerm.toLowerCase()),
     )
   }
@@ -118,12 +111,12 @@ export function AlumnosRegularidad() {
               <SelectValue placeholder="Select Grade" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Grades</SelectItem>
-              <SelectItem value="1st Grade">1st Grade</SelectItem>
-              <SelectItem value="2nd Grade">2nd Grade</SelectItem>
-              <SelectItem value="3rd Grade">3rd Grade</SelectItem>
-              <SelectItem value="4th Grade">4th Grade</SelectItem>
-              <SelectItem value="5th Grade">5th Grade</SelectItem>
+              <SelectItem value="all">Todos los Grados</SelectItem>
+              {gradesList.map((grado) => (
+                <SelectItem key={grado} value={gradoToTexto(grado)}>
+                  {gradoToTexto(grado)}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -131,18 +124,18 @@ export function AlumnosRegularidad() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search students..."
+              placeholder="Buscar alumnos..."
               className="pl-8 focus-visible-ring"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              aria-label="Search students"
+              aria-label="Buscar alumnos"
             />
           </div>
         </div>
 
         <Button variant="outline" size="sm" className="focus-visible-ring">
           <Download className="mr-2 h-4 w-4" />
-          Export List
+          Exportar Lista
         </Button>
       </div>
 
@@ -155,7 +148,7 @@ export function AlumnosRegularidad() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Student Regularity Summary</CardTitle>
+              <CardTitle>Resumen de Regularidad de Alumnos</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-3">
@@ -164,10 +157,10 @@ export function AlumnosRegularidad() {
                     <CheckCircle2 className="h-6 w-6 text-success" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Regular Students</p>
+                    <p className="text-sm text-muted-foreground">Alumnos Regulares</p>
                     <p className="text-2xl font-bold">{summary.regularCount}</p>
                     <p className="text-xs text-muted-foreground">
-                      {Math.round((summary.regularCount / summary.total) * 100)}% of total
+                      {Math.round((summary.regularCount / summary.total) * 100)}% del total
                     </p>
                   </div>
                 </div>
@@ -176,10 +169,10 @@ export function AlumnosRegularidad() {
                     <AlertCircle className="h-6 w-6 text-danger" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Irregular Students</p>
+                    <p className="text-sm text-muted-foreground">Alumnos Irregulares</p>
                     <p className="text-2xl font-bold">{summary.irregularCount}</p>
                     <p className="text-xs text-muted-foreground">
-                      {Math.round((summary.irregularCount / summary.total) * 100)}% of total
+                      {Math.round((summary.irregularCount / summary.total) * 100)}% del total
                     </p>
                   </div>
                 </div>
@@ -188,9 +181,9 @@ export function AlumnosRegularidad() {
                     <CheckCircle2 className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Students</p>
+                    <p className="text-sm text-muted-foreground">Total de Alumnos</p>
                     <p className="text-2xl font-bold">{summary.total}</p>
-                    <p className="text-xs text-muted-foreground">Across all grades</p>
+                    <p className="text-xs text-muted-foreground">En todos los grados</p>
                   </div>
                 </div>
               </div>
@@ -225,7 +218,21 @@ export function AlumnosRegularidad() {
                     <div className="flex items-center gap-2">
                       <span className="font-semibold">{grade}</span>
                       <div className="flex gap-2">
-                        <span className="badge-regular">
+                        <span
+                          className="badge-regular"
+                          style={{
+                            backgroundColor: '#22c55e33', // verde suave
+                            color: '#15803d', // verde fuerte
+                            borderRadius: '9999px',
+                            padding: '0.25rem 0.75rem',
+                            fontWeight: 500,
+                            fontSize: '0.875rem', // igual que Irregular
+                            fontFamily: 'inherit', // igual que Irregular
+                            letterSpacing: 'normal', // igual que Irregular
+                            lineHeight: '1.25rem', // igual que Irregular
+                            display: 'inline-block',
+                          }}
+                        >
                           Regular: {studentsByGrade[grade as keyof typeof studentsByGrade].regular.length}
                         </span>
                         <span className="badge-irregular">
@@ -238,7 +245,7 @@ export function AlumnosRegularidad() {
                     <div className="px-4 py-2">
                       <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
                         <CheckCircle2 className="h-4 w-4 text-success" />
-                        Regular Students
+                        Alumnos Regulares
                       </h4>
                       <div className="space-y-2 mb-4">
                         {filterStudents(studentsByGrade[grade as keyof typeof studentsByGrade].regular).length > 0 ? (
@@ -252,28 +259,20 @@ export function AlumnosRegularidad() {
                                 className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50"
                               >
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium">{student.name}</span>
-                                  <span className="text-xs text-muted-foreground">({student.id})</span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                  <div className="text-sm">
-                                    <span className="font-medium">{student.averageGrade}</span>
-                                  </div>
-                                  <div className="text-sm">
-                                    <span className="text-success">{student.attendance}</span>
-                                  </div>
+                                  <span className="text-sm font-medium">{student.nombre}</span>
+                                  <span className="text-xs text-muted-foreground">({student.matricula || student.id})</span>
                                 </div>
                               </motion.div>
                             ),
                           )
                         ) : (
-                          <p className="text-sm text-muted-foreground py-2">No regular students found.</p>
+                          <p className="text-sm text-muted-foreground py-2">No se encontraron alumnos regulares.</p>
                         )}
                       </div>
 
                       <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
                         <AlertCircle className="h-4 w-4 text-danger" />
-                        Irregular Students
+                        Alumnos Irregulares
                       </h4>
                       <div className="space-y-2">
                         {filterStudents(studentsByGrade[grade as keyof typeof studentsByGrade].irregular).length > 0 ? (
@@ -287,22 +286,14 @@ export function AlumnosRegularidad() {
                                 className="flex items-center justify-between p-2 rounded-md  bg-opacity-5 hover: hover:bg-opacity-10"
                               >
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium">{student.name}</span>
-                                  <span className="text-xs text-muted-foreground">({student.id})</span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                  <div className="text-sm">
-                                    <span className="font-medium text-danger">{student.averageGrade}</span>
-                                  </div>
-                                  <div className="text-sm">
-                                    <span className="text-danger">{student.attendance}</span>
-                                  </div>
+                                  <span className="text-sm font-medium">{student.nombre}</span>
+                                  <span className="text-xs text-muted-foreground">({student.matricula || student.id})</span>
                                 </div>
                               </motion.div>
                             ),
                           )
                         ) : (
-                          <p className="text-sm text-muted-foreground py-2">No irregular students found.</p>
+                          <p className="text-sm text-muted-foreground py-2">No se encontraron alumnos irregulares.</p>
                         )}
                       </div>
                     </div>

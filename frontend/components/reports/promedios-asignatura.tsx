@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
@@ -8,195 +8,132 @@ import { Download, BarChart3 } from "lucide-react"
 import { motion } from "framer-motion"
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 
-// Sample data for subject averages
-const subjectAverages = [
-  {
-    name: "Matemáticas",
-    average: 85,
-    previousAverage: 82,
-  },
-  {
-    name: "Ciencias",
-    average: 78,
-    previousAverage: 75,
-  },
-  {
-    name: "Inglés",
-    average: 82,
-    previousAverage: 80,
-  },
-  {
-    name: "Historia",
-    average: 76,
-    previousAverage: 74,
-  },
-  {
-    name: "Arte",
-    average: 90,
-    previousAverage: 88,
-  },
-  {
-    name: "Música",
-    average: 88,
-    previousAverage: 85,
-  },
-  {
-    name: "Educación Física",
-    average: 92,
-    previousAverage: 90,
-  },
-]
-
-// Sample data for grade-level averages
-const gradeLevelAverages = {
-  "1er Grado": [
-    { name: "Matemáticas", average: 83 },
-    { name: "Ciencias", average: 80 },
-    { name: "Inglés", average: 85 },
-    { name: "Historia", average: 78 },
-    { name: "Arte", average: 92 },
-    { name: "Música", average: 90 },
-    { name: "Educación Física", average: 94 },
-  ],
-  "2do Grado": [
-    { name: "Matemáticas", average: 84 },
-    { name: "Ciencias", average: 79 },
-    { name: "Inglés", average: 83 },
-    { name: "Historia", average: 77 },
-    { name: "Arte", average: 91 },
-    { name: "Música", average: 89 },
-    { name: "Educación Física", average: 93 },
-  ],
-  "3er Grado": [
-    { name: "Matemáticas", average: 85 },
-    { name: "Ciencias", average: 78 },
-    { name: "Inglés", average: 82 },
-    { name: "Historia", average: 76 },
-    { name: "Arte", average: 90 },
-    { name: "Música", average: 88 },
-    { name: "Educación Física", average: 92 },
-  ],
-  "4to Grado": [
-    { name: "Matemáticas", average: 86 },
-    { name: "Ciencias", average: 80 },
-    { name: "Inglés", average: 84 },
-    { name: "Historia", average: 79 },
-    { name: "Arte", average: 88 },
-    { name: "Música", average: 87 },
-    { name: "Educación Física", average: 91 },
-  ],
-  "5to Grado": [
-    { name: "Matemáticas", average: 87 },
-    { name: "Ciencias", average: 81 },
-    { name: "Inglés", average: 85 },
-    { name: "Historia", average: 80 },
-    { name: "Arte", average: 89 },
-    { name: "Música", average: 86 },
-    { name: "Educación Física", average: 90 },
-  ],
+// Utilidad para mostrar el grado como texto
+function gradoToTexto(grado: number) {
+  switch (grado) {
+    case 1:
+      return "1er Grado"
+    case 2:
+      return "2do Grado"
+    case 3:
+      return "3er Grado"
+    case 4:
+      return "4to Grado"
+    case 5:
+      return "5to Grado"
+    case 6:
+      return "6to Grado"
+    default:
+      return grado
+  }
 }
 
 export function PromediosAsignatura() {
-  const [selectedPeriod, setSelectedPeriod] = useState("current")
-  const [selectedGrade, setSelectedGrade] = useState("all")
-  const [chartType, setChartType] = useState<"bar" | "comparison">("bar")
+  const [periodo, setPeriodo] = useState("1")
+  const [grado, setGrado] = useState("all")
+  const [data, setData] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [showComparativa, setShowComparativa] = useState(false)
 
-  // Get data based on selected grade
-  const getChartData = () => {
-    if (selectedGrade === "all") {
-      return subjectAverages
-    } else {
-      return gradeLevelAverages[selectedGrade as keyof typeof gradeLevelAverages]
-    }
-  }
+  useEffect(() => {
+    setLoading(true)
+    const url = `http://localhost:4000/api/reportes/promedios-asignatura?periodo=${periodo}&grado=${grado}`
+    fetch(url)
+      .then((res) => res.json())
+      .then((res) => Array.isArray(res) ? setData(res.filter(d => grado === "all" || String(d.grado) === String(grado))) : setData([]))
+      .catch(() => setData([]))
+      .finally(() => setLoading(false))
+  }, [periodo, grado])
 
-  const chartData = getChartData()
+  const filteredData = data
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Select value={selectedGrade} onValueChange={setSelectedGrade}>
+          <Select value={grado} onValueChange={setGrado}>
             <SelectTrigger className="w-[180px] focus-visible-ring">
               <SelectValue placeholder="Selecciona Grado" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los Grados</SelectItem>
-              <SelectItem value="1er Grado">1er Grado</SelectItem>
-              <SelectItem value="2do Grado">2do Grado</SelectItem>
-              <SelectItem value="3er Grado">3er Grado</SelectItem>
-              <SelectItem value="4to Grado">4to Grado</SelectItem>
-              <SelectItem value="5to Grado">5to Grado</SelectItem>
+              {[1, 2, 3, 4, 5, 6].map((g) => (
+                <SelectItem key={g} value={String(g)}>
+                  {gradoToTexto(g)}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
-
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-[180px] focus-visible-ring">
-              <SelectValue placeholder="Selecciona Periodo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="current">Semestre Actual</SelectItem>
-              <SelectItem value="previous">Semestre Anterior</SelectItem>
-              <SelectItem value="year">Ciclo Escolar</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={chartType} onValueChange={(value) => setChartType(value as "bar" | "comparison")}>
-            <SelectTrigger className="w-[180px] focus-visible-ring">
-              <SelectValue placeholder="Tipo de Gráfica" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="bar">Gráfica de Barras</SelectItem>
-              <SelectItem value="comparison">Gráfica Comparativa</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <Select value={periodo} onValueChange={setPeriodo}>
+              <SelectTrigger className="w-[180px] focus-visible-ring">
+                <SelectValue placeholder="Selecciona Trimestre" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1er Trimestre</SelectItem>
+                <SelectItem value="2">2do Trimestre</SelectItem>
+                <SelectItem value="3">3er Trimestre</SelectItem>
+              </SelectContent>
+            </Select>
+            {Number(periodo) > 1 && (
+              <Button
+                variant={showComparativa ? "default" : "outline"}
+                size="sm"
+                className="focus-visible-ring"
+                onClick={() => setShowComparativa((v) => !v)}
+              >
+                {showComparativa ? "Ocultar comparativa" : "Ver comparativa"}
+              </Button>
+            )}
+          </div>
         </div>
-
         <Button variant="outline" size="sm" className="focus-visible-ring">
           <Download className="mr-2 h-4 w-4" />
           Exportar Datos
         </Button>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-xl">
-              {selectedGrade === "all" ? "Todos los Grados" : selectedGrade} - Promedios por Asignatura
-            </CardTitle>
-            <BarChart3 className="h-5 w-5 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="h-[400px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} tick={{ fontSize: 12 }} />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip formatter={(value) => [`${value}%`, "Promedio"]} labelStyle={{ fontWeight: "bold" }} />
-                  <Legend />
-                  <Bar
-                    dataKey="average"
-                    name="Promedio Actual"
-                    fill="hsl(var(--primary))"
-                    radius={[4, 4, 0, 0]}
-                    animationDuration={1500}
-                  />
-                  {chartType === "comparison" && selectedGrade === "all" && (
+      {loading ? (
+        <div className="text-center">Cargando datos...</div>
+      ) : (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-xl">Promedios por Asignatura ({periodo}er Trimestre)</CardTitle>
+              <BarChart3 className="h-5 w-5 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="nombre" angle={-45} textAnchor="end" height={70} tick={{ fontSize: 12 }} />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip formatter={(value, name) => [`${value}%`, name === 'previo' ? 'Trimestre anterior' : 'Promedio']} labelStyle={{ fontWeight: "bold" }} />
+                    <Legend />
+                    {showComparativa && Number(periodo) > 1 && (
+                      <Bar
+                        dataKey="previo"
+                        name="Trimestre anterior"
+                        fill="#d1d5db"
+                        radius={[4, 4, 0, 0]}
+                        animationDuration={1500}
+                      />
+                    )}
                     <Bar
-                      dataKey="previousAverage"
-                      name="Promedio Anterior"
-                      fill="hsl(var(--secondary))"
+                      dataKey="promedio"
+                      name="Promedio Actual"
+                      fill="hsl(var(--primary))"
                       radius={[4, 4, 0, 0]}
                       animationDuration={1500}
                     />
-                  )}
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2">
         <motion.div
@@ -210,8 +147,8 @@ export function PromediosAsignatura() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {chartData
-                  .sort((a, b) => b.average - a.average)
+                {filteredData
+                  .sort((a, b) => b.promedio - a.promedio)
                   .slice(0, 3)
                   .map((subject, index) => (
                     <div key={index} className="flex items-center justify-between">
@@ -219,9 +156,10 @@ export function PromediosAsignatura() {
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                           {index + 1}
                         </div>
-                        <span className="font-medium">{subject.name}</span>
+                        <span className="font-medium">{subject.nombre}</span>
+                        <span className="ml-2 text-xs text-muted-foreground">{gradoToTexto(subject.grado)}</span>
                       </div>
-                      <span className="text-lg font-bold">{subject.average}%</span>
+                      <span className="text-lg font-bold">{subject.promedio}%</span>
                     </div>
                   ))}
               </div>
@@ -240,8 +178,8 @@ export function PromediosAsignatura() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {chartData
-                  .sort((a, b) => a.average - b.average)
+                {filteredData
+                  .sort((a, b) => a.promedio - b.promedio)
                   .slice(0, 3)
                   .map((subject, index) => (
                     <div key={index} className="flex items-center justify-between">
@@ -249,9 +187,10 @@ export function PromediosAsignatura() {
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-danger/10 text-danger">
                           {index + 1}
                         </div>
-                        <span className="font-medium">{subject.name}</span>
+                        <span className="font-medium">{subject.nombre}</span>
+                        <span className="ml-2 text-xs text-muted-foreground">{gradoToTexto(subject.grado)}</span>
                       </div>
-                      <span className="text-lg font-bold">{subject.average}%</span>
+                      <span className="text-lg font-bold">{subject.promedio}%</span>
                     </div>
                   ))}
               </div>

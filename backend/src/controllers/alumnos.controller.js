@@ -51,10 +51,26 @@ async function eliminarAlumno(req, res) {
   }
 }
 
+// Obtener el total de usuarios registrados en Supabase (maestros)
+async function totalUsuariosSupabase(req, res) {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const { data, error } = await supabase.auth.admin.listUsers();
+    if (error) throw error;
+    res.json({ total: data?.users?.length || 0 });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   crearAlumno,
   obtenerAlumnos,
   obtenerAlumnoPorId,
   actualizarAlumno,
   eliminarAlumno,
+  totalUsuariosSupabase,
 };

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/hooks/use-toast"
+import { supabase } from "@/lib/supabaseClient"
 
 const formSchema = z
   .object({
@@ -46,20 +47,25 @@ export function RegisterForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
-
-    // Simulate API call
-    setTimeout(() => {
-      // TODO: Integrate with actual registration API
-      console.log("Registration values:", values)
-
-      setIsLoading(false)
+    const { email, password } = values
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    })
+    setIsLoading(false)
+    if (error) {
       toast({
-        title: "Registro exitoso",
-        description: "Tu cuenta ha sido creada.",
+        title: "Error al registrar",
+        description: error.message,
+        variant: "destructive",
       })
-
-      router.push("/login")
-    }, 1000)
+      return
+    }
+    toast({
+      title: "Registro exitoso",
+      description: "Tu cuenta ha sido creada. Revisa tu correo para confirmar.",
+    })
+    router.push("/login")
   }
 
   return (

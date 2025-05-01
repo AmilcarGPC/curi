@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,134 +19,37 @@ import { DeleteStudentDialog } from "./delete-student-dialog"
 import { useToast } from "@/hooks/use-toast"
 import { motion, AnimatePresence } from "framer-motion"
 
-// Sample data for students
-const studentsData = [
-  {
-    id: "STU001",
-    matricula: "A12345",
-    nombre: "Alex Chen",
-    grado: "3rd Grade",
-    correoElectronico: "alex.chen@school.edu",
-    teacher: "Ms. Johnson",
-    averageGrade: "A",
-    attendance: "98%",
-  },
-  {
-    id: "STU002",
-    matricula: "B23456",
-    nombre: "Emma Wilson",
-    grado: "4th Grade",
-    correoElectronico: "emma.wilson@school.edu",
-    teacher: "Mr. Brown",
-    averageGrade: "B+",
-    attendance: "95%",
-  },
-  {
-    id: "STU003",
-    matricula: "C34567",
-    nombre: "Olivia Martinez",
-    grado: "2nd Grade",
-    correoElectronico: "olivia.martinez@school.edu",
-    teacher: "Mrs. Davis",
-    averageGrade: "A-",
-    attendance: "97%",
-  },
-  {
-    id: "STU004",
-    matricula: "D45678",
-    nombre: "Noah Johnson",
-    grado: "5th Grade",
-    correoElectronico: "noah.johnson@school.edu",
-    teacher: "Mr. Wilson",
-    averageGrade: "B",
-    attendance: "92%",
-  },
-  {
-    id: "STU005",
-    matricula: "E56789",
-    nombre: "Sophia Williams",
-    grado: "1st Grade",
-    correoElectronico: "sophia.williams@school.edu",
-    teacher: "Ms. Thompson",
-    averageGrade: "A+",
-    attendance: "99%",
-  },
-  {
-    id: "STU006",
-    matricula: "F67890",
-    nombre: "Liam Garcia",
-    grado: "3rd Grade",
-    correoElectronico: "liam.garcia@school.edu",
-    teacher: "Ms. Johnson",
-    averageGrade: "B-",
-    attendance: "90%",
-  },
-  {
-    id: "STU007",
-    matricula: "G78901",
-    nombre: "Ava Rodriguez",
-    grado: "4th Grade",
-    correoElectronico: "ava.rodriguez@school.edu",
-    teacher: "Mr. Brown",
-    averageGrade: "A",
-    attendance: "96%",
-  },
-  {
-    id: "STU008",
-    matricula: "H89012",
-    nombre: "Ethan Lee",
-    grado: "2nd Grade",
-    correoElectronico: "ethan.lee@school.edu",
-    teacher: "Mrs. Davis",
-    averageGrade: "B+",
-    attendance: "94%",
-  },
-  {
-    id: "STU009",
-    matricula: "I90123",
-    nombre: "Isabella Brown",
-    grado: "5th Grade",
-    correoElectronico: "isabella.brown@school.edu",
-    teacher: "Mr. Wilson",
-    averageGrade: "A-",
-    attendance: "97%",
-  },
-  {
-    id: "STU010",
-    matricula: "J01234",
-    nombre: "James Taylor",
-    grado: "1st Grade",
-    correoElectronico: "james.taylor@school.edu",
-    teacher: "Ms. Thompson",
-    averageGrade: "B+",
-    attendance: "93%",
-  },
-  {
-    id: "STU011",
-    matricula: "K12345",
-    nombre: "Mia Anderson",
-    grado: "3rd Grade",
-    correoElectronico: "mia.anderson@school.edu",
-    teacher: "Ms. Johnson",
-    averageGrade: "A",
-    attendance: "98%",
-  },
-  {
-    id: "STU012",
-    matricula: "L23456",
-    nombre: "Benjamin Martin",
-    grado: "4th Grade",
-    correoElectronico: "benjamin.martin@school.edu",
-    teacher: "Mr. Brown",
-    averageGrade: "B",
-    attendance: "91%",
-  },
-]
+export type Student = {
+  id: string
+  matricula: string
+  nombre: string
+  grado: number
+  correo: string
+}
 
-export type Student = (typeof studentsData)[0]
+// Utilidad para mostrar el grado como texto
+function gradoToTexto(grado: number) {
+  switch (grado) {
+    case 1:
+      return "1er Grado"
+    case 2:
+      return "2do Grado"
+    case 3:
+      return "3er Grado"
+    case 4:
+      return "4to Grado"
+    case 5:
+      return "5to Grado"
+    case 6:
+      return "6to Grado"
+    default:
+      return grado
+  }
+}
 
 export function StudentsTable() {
-  const [students, setStudents] = useState<Student[]>(studentsData)
+  const [students, setStudents] = useState<Student[]>([])
+  const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -159,13 +62,23 @@ export function StudentsTable() {
   const itemsPerPage = 5
   const totalPages = Math.ceil(students.length / itemsPerPage)
 
+  // Fetch students from backend
+  useEffect(() => {
+    setLoading(true)
+    fetch("http://localhost:4000/api/alumnos")
+      .then((res) => res.json())
+      .then((data) => setStudents(data))
+      .catch(() => setStudents([]))
+      .finally(() => setLoading(false))
+  }, [])
+
   // Filter students based on search term
   const filteredStudents = students.filter(
     (student) =>
       student.matricula.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.grado.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.correoElectronico.toLowerCase().includes(searchTerm.toLowerCase()),
+      student.grado.toString().includes(searchTerm) ||
+      student.correo.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   // Get current page students
@@ -177,54 +90,77 @@ export function StudentsTable() {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
 
   // Handle add student
-  const handleAddStudent = (newStudent: Omit<Student, "id">) => {
-    // In a real app, this would be an API call
-    const id = `STU${Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(3, "0")}`
-    const studentWithId = { ...newStudent, id }
-
-    setStudents([...students, studentWithId])
-    setIsAddDialogOpen(false)
-
-    toast({
-      title: "Alumno agregado",
-      description: `${newStudent.nombre} ha sido agregado exitosamente.`,
-      variant: "success",
-    })
+  const handleAddStudent = async (newStudent: Omit<Student, "id">) => {
+    setLoading(true)
+    try {
+      const res = await fetch("http://localhost:4000/api/alumnos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newStudent),
+      })
+      const created = await res.json()
+      setStudents((prev) => [...prev, created])
+      setIsAddDialogOpen(false)
+      toast({
+        title: "Alumno agregado",
+        description: `${newStudent.nombre} ha sido agregado exitosamente.`,
+        variant: "success",
+      })
+    } catch {
+      toast({ title: "Error", description: "No se pudo agregar el alumno.", variant: "destructive" })
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Handle edit student
-  const handleEditStudent = (updatedStudent: Student) => {
-    // In a real app, this would be an API call
-    const updatedStudents = students.map((student) => (student.id === updatedStudent.id ? updatedStudent : student))
-
-    setStudents(updatedStudents)
-    setIsEditDialogOpen(false)
-    setSelectedStudent(null)
-
-    toast({
-      title: "Alumno actualizado",
-      description: `${updatedStudent.nombre} ha sido actualizado exitosamente.`,
-      variant: "success",
-    })
+  const handleEditStudent = async (updatedStudent: Student) => {
+    setLoading(true)
+    try {
+      const res = await fetch(`http://localhost:4000/api/alumnos/${updatedStudent.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          matricula: updatedStudent.matricula,
+          nombre: updatedStudent.nombre,
+          grado: updatedStudent.grado,
+          correo: updatedStudent.correo,
+        }),
+      })
+      const updated = await res.json()
+      setStudents((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
+      setIsEditDialogOpen(false)
+      setSelectedStudent(null)
+      toast({
+        title: "Alumno actualizado",
+        description: `${updatedStudent.nombre} ha sido actualizado exitosamente.`,
+        variant: "success",
+      })
+    } catch {
+      toast({ title: "Error", description: "No se pudo actualizar el alumno.", variant: "destructive" })
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Handle delete student
-  const handleDeleteStudent = (id: string) => {
-    // In a real app, this would be an API call
-    const updatedStudents = students.filter((student) => student.id !== id)
-    const deletedStudent = students.find((student) => student.id === id)
-
-    setStudents(updatedStudents)
-    setIsDeleteDialogOpen(false)
-    setSelectedStudent(null)
-
-    toast({
-      title: "Alumno eliminado",
-      description: `${deletedStudent?.nombre || "Alumno"} ha sido eliminado exitosamente.`,
-      variant: "success",
-    })
+  const handleDeleteStudent = async (id: string) => {
+    setLoading(true)
+    try {
+      await fetch(`http://localhost:4000/api/alumnos/${id}`, { method: "DELETE" })
+      setStudents((prev) => prev.filter((s) => s.id !== id))
+      setIsDeleteDialogOpen(false)
+      setSelectedStudent(null)
+      toast({
+        title: "Alumno eliminado",
+        description: `El alumno ha sido eliminado exitosamente.`,
+        variant: "success",
+      })
+    } catch {
+      toast({ title: "Error", description: "No se pudo eliminar el alumno.", variant: "destructive" })
+    } finally {
+      setLoading(false)
+    }
   }
 
   const tableRowVariants = {
@@ -278,7 +214,7 @@ export function StudentsTable() {
               <TableHead>Matrícula</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>Grado</TableHead>
-              <TableHead>Correo Electrónico</TableHead>
+              <TableHead>Correo</TableHead>
               <TableHead className="w-[80px]" aria-label="Acciones"></TableHead>
             </TableRow>
           </TableHeader>
@@ -299,10 +235,10 @@ export function StudentsTable() {
                     <TableCell>{student.nombre}</TableCell>
                     <TableCell>
                       <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                        {student.grado}
+                        {gradoToTexto(student.grado)}
                       </span>
                     </TableCell>
-                    <TableCell>{student.correoElectronico}</TableCell>
+                    <TableCell>{student.correo}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

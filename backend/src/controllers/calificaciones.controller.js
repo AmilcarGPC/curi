@@ -46,10 +46,32 @@ async function eliminarCalificacion(req, res) {
   }
 }
 
+// Endpoint para obtener el promedio general del último periodo completamente cargado
+async function promedioUltimoPeriodoCompleto(req, res) {
+  try {
+    const result = await calificacionesService.obtenerPromedioUltimoPeriodoCompleto();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+// Obtener el total de calificaciones registradas
+async function totalCalificaciones(req, res) {
+  try {
+    const total = await calificacionesService.totalCalificaciones();
+    res.json({ total });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   crearCalificacion,
   obtenerCalificaciones,
   obtenerCalificacionPorId,
   actualizarCalificacion,
   eliminarCalificacion,
+  promedioUltimoPeriodoCompleto,
+  totalCalificaciones,
 };

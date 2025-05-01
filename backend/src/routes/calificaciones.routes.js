@@ -9,4 +9,10 @@ router.post('/', validarCalificacion, calificacionesController.crearCalificacion
 router.put('/:id', validarCalificacion, calificacionesController.actualizarCalificacion);
 router.delete('/:id', calificacionesController.eliminarCalificacion);
 
+// Endpoint para el promedio general del último periodo completamente cargado
+router.get('/promedio-ultimo-periodo', calificacionesController.promedioUltimoPeriodoCompleto);
+
+// Endpoint para obtener el total de calificaciones
+router.get('/total', calificacionesController.totalCalificaciones);
+
 module.exports = router;

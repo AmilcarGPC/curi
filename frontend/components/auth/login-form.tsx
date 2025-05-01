@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/hooks/use-toast"
+import { supabase } from "@/lib/supabaseClient"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -33,20 +34,25 @@ export function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
-
-    // Simulate API call
-    setTimeout(() => {
-      // TODO: Integrate with actual authentication API
-      console.log("Login values:", values)
-
-      setIsLoading(false)
+    const { email, password } = values
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    setIsLoading(false)
+    if (error) {
       toast({
-        title: "Inicio de sesión exitoso",
-        description: "Redirigiendo al panel...",
+        title: "Error de autenticación",
+        description: error.message,
+        variant: "destructive",
       })
-
-      router.push("/dashboard")
-    }, 1000)
+      return
+    }
+    toast({
+      title: "Inicio de sesión exitoso",
+      description: "Redirigiendo al panel...",
+    })
+    router.push("/dashboard")
   }
 
   return (

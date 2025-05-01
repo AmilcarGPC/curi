@@ -8,17 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   BarChart,
   Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
+  ResponsiveContainer,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
 } from "recharts"
 import { Download, FileText, Printer } from "lucide-react"
 
@@ -67,18 +65,6 @@ const subjectPerformance = [
     current: 92,
     previous: 90,
   },
-]
-
-const attendanceData = [
-  { name: "Sep", attendance: 97 },
-  { name: "Oct", attendance: 96 },
-  { name: "Nov", attendance: 95 },
-  { name: "Dec", attendance: 93 },
-  { name: "Jan", attendance: 94 },
-  { name: "Feb", attendance: 95 },
-  { name: "Mar", attendance: 96 },
-  { name: "Apr", attendance: 97 },
-  { name: "May", attendance: 98 },
 ]
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"]
@@ -137,7 +123,6 @@ export function ReportsOverview() {
         <TabsList>
           <TabsTrigger value="overview">Resumen</TabsTrigger>
           <TabsTrigger value="grades">Calificaciones</TabsTrigger>
-          <TabsTrigger value="attendance">Asistencia</TabsTrigger>
           <TabsTrigger value="subjects">Asignaturas</TabsTrigger>
         </TabsList>
 
@@ -191,33 +176,6 @@ export function ReportsOverview() {
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="attendance" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tendencias de Asistencia</CardTitle>
-              <CardDescription>Porcentaje de asistencia mensual</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={attendanceData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis domain={[90, 100]} />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="attendance"
-                    name="% Asistencia"
-                    stroke="#8884d8"
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         <TabsContent value="grades">

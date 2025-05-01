@@ -34,10 +34,7 @@ export function EditStudentDialog({ open, onOpenChange, student, onSubmit }: Edi
       matricula: student.matricula,
       nombre: student.nombre,
       grado: student.grado,
-      correoElectronico: student.correoElectronico,
-      teacher: student.teacher,
-      averageGrade: student.averageGrade,
-      attendance: student.attendance,
+      correo: student.correo,
     },
   })
 
@@ -48,21 +45,15 @@ export function EditStudentDialog({ open, onOpenChange, student, onSubmit }: Edi
         matricula: student.matricula,
         nombre: student.nombre,
         grado: student.grado,
-        correoElectronico: student.correoElectronico,
-        teacher: student.teacher,
-        averageGrade: student.averageGrade,
-        attendance: student.attendance,
+        correo: student.correo,
       })
     }
   }, [student, form])
 
   const handleSubmit = async (values: StudentFormValues) => {
     setIsSubmitting(true)
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    onSubmit({ ...values, id: student.id })
+    // Llama directamente a onSubmit, que ahora hace la petición real en students-table.tsx
+    await onSubmit({ ...values, id: student.id })
     setIsSubmitting(false)
   }
 
@@ -110,18 +101,22 @@ export function EditStudentDialog({ open, onOpenChange, student, onSubmit }: Edi
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Grado *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      value={field.value ? String(field.value) : undefined}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecciona grado" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="1st Grade">1er Grado</SelectItem>
-                        <SelectItem value="2nd Grade">2do Grado</SelectItem>
-                        <SelectItem value="3rd Grade">3er Grado</SelectItem>
-                        <SelectItem value="4th Grade">4to Grado</SelectItem>
-                        <SelectItem value="5th Grade">5to Grado</SelectItem>
+                        <SelectItem value="1">1er Grado</SelectItem>
+                        <SelectItem value="2">2do Grado</SelectItem>
+                        <SelectItem value="3">3er Grado</SelectItem>
+                        <SelectItem value="4">4to Grado</SelectItem>
+                        <SelectItem value="5">5to Grado</SelectItem>
+                        <SelectItem value="6">6to Grado</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -130,10 +125,10 @@ export function EditStudentDialog({ open, onOpenChange, student, onSubmit }: Edi
               />
               <FormField
                 control={form.control}
-                name="correoElectronico"
+                name="correo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Correo Electrónico *</FormLabel>
+                    <FormLabel>Correo *</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="alumno@escuela.edu" {...field} />
                     </FormControl>
@@ -142,30 +137,6 @@ export function EditStudentDialog({ open, onOpenChange, student, onSubmit }: Edi
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="teacher"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Docente *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona docente" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Ms. Johnson">Mtra. Johnson</SelectItem>
-                      <SelectItem value="Mr. Brown">Mr. Brown</SelectItem>
-                      <SelectItem value="Mrs. Davis">Sra. Davis</SelectItem>
-                      <SelectItem value="Mr. Wilson">Mr. Wilson</SelectItem>
-                      <SelectItem value="Ms. Thompson">Mtra. Thompson</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                 Cancelar
