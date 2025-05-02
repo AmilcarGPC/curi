@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
+const config = require('./utils/config');
 
 const app = express();
 app.use(cors());
@@ -9,7 +9,7 @@ app.use(express.json());
 const routes = require('./routes');
 app.use('/api', routes);
 
-const PORT = process.env.PORT || 4000;
+const PORT = config.port;
 app.listen(PORT, () => {
-  console.log(`Servidor backend escuchando en el puerto ${PORT}`);
+  console.log(`Servidor backend escuchando en el puerto ${PORT} en modo ${config.nodeEnv}`);
 });
