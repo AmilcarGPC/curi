@@ -8,12 +8,14 @@ services:
     container_name: curi-backend
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "5000:5000"
     env_file:
       - ./backend/.env
     environment:
       - NODE_ENV=production
-      - PORT=3001
+      - PORT=5000
+      # Permitir conexiones desde cualquier host
+      - HOST=0.0.0.0
     networks:
       - curi-network
 
@@ -29,8 +31,11 @@ services:
       - ./frontend/.env
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://backend:3001/api
+      # Esta variable sólo es importante durante la construcción, en ejecución usará la lógica de config.ts
+      - NEXT_PUBLIC_API_URL=
       - PORT=3006
+      # Permitir conexiones desde cualquier host
+      - HOST=0.0.0.0
     depends_on:
       - backend
     networks:

@@ -14,10 +14,11 @@ COPY . .
 
 # Variables de entorno de ejemplo (se sobrescribirán en Coolify)
 ENV NODE_ENV=production
-ENV PORT=3001
+ENV PORT=5000
+ENV HOST=0.0.0.0
 
 # Exponer el puerto en el que se ejecutará la aplicación
-EXPOSE 3001
+EXPOSE 5000
 
 # Comando para iniciar la aplicación
 CMD ["npm", "start"]
