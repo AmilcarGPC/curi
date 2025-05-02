@@ -3,9 +3,9 @@ const cors = require('cors');
 const config = require('./utils/config');
 
 const app = express();
-// Configurar CORS para permitir peticiones desde cualquier origen en producción
+// Configurar CORS usando la configuración centralizada
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? '*' : 'http://localhost:3006',
+  origin: config.cors.allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
