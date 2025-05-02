@@ -18,6 +18,7 @@ import { EditSubjectDialog } from "./edit-subject-dialog"
 import { DeleteSubjectDialog } from "./delete-subject-dialog"
 import { useToast } from "@/hooks/use-toast"
 import { motion, AnimatePresence } from "framer-motion"
+import { config } from "@/lib/config"
 
 export type Subject = {
   id: string
@@ -57,14 +58,33 @@ export function SubjectsTable() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null)
   const { toast } = useToast()
+  const [loading, setLoading] = useState(false)
 
   // Fetch resumen de asignaturas (alumnos y promedio del último periodo)
   useEffect(() => {
-    fetch("http://localhost:5000/api/asignaturas/resumen")
-      .then((res) => res.json())
-      .then((data) => Array.isArray(data) ? setSubjects(data) : setSubjects([]))
-      .catch(() => setSubjects([]))
+    loadSubjects()
   }, [])
+
+  const loadSubjects = async () => {
+    try {
+      setLoading(true)
+      fetch(`${config.apiUrl}/asignaturas/resumen`)
+        .then((response) => response.json())
+        .then((data) => {
+          setSubjects(Array.isArray(data) ? data : [])
+          setLoading(false)
+        })
+        .catch((error) => {
+          console.error("Error al cargar las asignaturas:", error)
+          setSubjects([])
+          setLoading(false)
+        })
+    } catch (error) {
+      console.error("Error al cargar las asignaturas:", error)
+      setSubjects([])
+      setLoading(false)
+    }
+  }
 
   const filteredSubjects = subjects.filter(
     (subject) =>
@@ -81,7 +101,8 @@ export function SubjectsTable() {
   // CRUD handlers
   const handleAddSubject = async (newSubject: Omit<Subject, "id">) => {
     try {
-      const res = await fetch("http://localhost:5000/api/asignaturas", {
+      setLoading(true)
+      const res = await fetch(`${config.apiUrl}/asignaturas`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newSubject),
@@ -89,15 +110,18 @@ export function SubjectsTable() {
       const created = await res.json()
       setSubjects((prev) => [...prev, created])
       setIsAddDialogOpen(false)
+      setLoading(false)
       toast({ title: "Asignatura agregada", description: `${created.nombre} agregada exitosamente.`, variant: "default" })
     } catch {
+      setLoading(false)
       toast({ title: "Error", description: "No se pudo agregar la asignatura.", variant: "destructive" })
     }
   }
 
   const handleEditSubject = async (updatedSubject: Subject) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/asignaturas/${updatedSubject.id}`, {
+      setLoading(true)
+      const res = await fetch(`${config.apiUrl}/asignaturas/${updatedSubject.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre: updatedSubject.nombre, grado: updatedSubject.grado }),
@@ -106,20 +130,25 @@ export function SubjectsTable() {
       setSubjects((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
       setIsEditDialogOpen(false)
       setSelectedSubject(null)
+      setLoading(false)
       toast({ title: "Asignatura actualizada", description: `${updated.nombre} actualizada exitosamente.`, variant: "default" })
     } catch {
+      setLoading(false)
       toast({ title: "Error", description: "No se pudo actualizar la asignatura.", variant: "destructive" })
     }
   }
 
   const handleDeleteSubject = async (id: string) => {
     try {
-      await fetch(`http://localhost:5000/api/asignaturas/${id}`, { method: "DELETE" })
+      setLoading(true)
+      await fetch(`${config.apiUrl}/asignaturas/${id}`, { method: "DELETE" })
       setSubjects((prev) => prev.filter((s) => s.id !== id))
       setIsDeleteDialogOpen(false)
       setSelectedSubject(null)
+      setLoading(false)
       toast({ title: "Asignatura eliminada", description: `La asignatura ha sido eliminada exitosamente.`, variant: "default" })
     } catch {
+      setLoading(false)
       toast({ title: "Error", description: "No se pudo eliminar la asignatura.", variant: "destructive" })
     }
   }

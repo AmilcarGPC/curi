@@ -8,6 +8,7 @@ import { Download, Search, AlertCircle, CheckCircle2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { motion, AnimatePresence } from "framer-motion"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { config } from "@/lib/config"
 
 // Utilidad para mostrar el grado como texto
 function gradoToTexto(grado: number) {
@@ -38,12 +39,19 @@ export function AlumnosRegularidad() {
   const [expandedGrades, setExpandedGrades] = useState<string[]>(["1er Grado"])
 
   useEffect(() => {
-    setLoading(true)
-    fetch(`http://localhost:5000/api/reportes/alumnos-regularidad?periodo=${periodo}`)
-      .then((res) => res.json())
-      .then(setAlumnos)
-      .catch(() => setAlumnos([]))
-      .finally(() => setLoading(false))
+    if (periodo) {
+      setLoading(true)
+      fetch(`${config.apiUrl}/reportes/alumnos-regularidad?periodo=${periodo}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setAlumnos(data)
+          setLoading(false)
+        })
+        .catch((error) => {
+          console.error("Error al cargar el reporte:", error)
+          setLoading(false)
+        })
+    }
   }, [periodo])
 
   // Obtener los grados disponibles

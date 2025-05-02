@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Download, BarChart3 } from "lucide-react"
 import { motion } from "framer-motion"
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { config } from "@/lib/config"
 
 // Utilidad para mostrar el grado como texto
 function gradoToTexto(grado: number) {
@@ -36,13 +37,21 @@ export function PromediosAsignatura() {
   const [showComparativa, setShowComparativa] = useState(false)
 
   useEffect(() => {
-    setLoading(true)
-    const url = `http://localhost:5000/api/reportes/promedios-asignatura?periodo=${periodo}&grado=${grado}`
-    fetch(url)
-      .then((res) => res.json())
-      .then((res) => Array.isArray(res) ? setData(res.filter(d => grado === "all" || String(d.grado) === String(grado))) : setData([]))
-      .catch(() => setData([]))
-      .finally(() => setLoading(false))
+    if (periodo && grado) {
+      setLoading(true)
+      const url = `${config.apiUrl}/reportes/promedios-asignatura?periodo=${periodo}&grado=${grado}`
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          setData(data.filter(d => grado === "all" || String(d.grado) === String(grado)))
+          setLoading(false)
+        })
+        .catch((error) => {
+          console.error("Error al cargar las asignaturas:", error)
+          setData([])
+          setLoading(false)
+        })
+    }
   }, [periodo, grado])
 
   const filteredData = data

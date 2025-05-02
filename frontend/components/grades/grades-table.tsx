@@ -19,6 +19,7 @@ import { EditGradeDialog } from "./edit-grade-dialog"
 import { DeleteGradeDialog } from "./delete-grade-dialog"
 import { useToast } from "@/hooks/use-toast"
 import { Pencil, Trash2, BookPlus } from "lucide-react"
+import { config } from "@/lib/config"
 
 const periodos = [
   { value: 1, label: "1er Trimestre" },
@@ -42,53 +43,65 @@ export function GradesTable() {
   const { toast } = useToast()
 
   useEffect(() => {
+    fetchGrades()
+  }, [currentPage, pageSize])
+
+  const fetchGrades = () => {
     setLoading(true)
-    fetch(`http://localhost:5000/api/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
-      .then((res) => res.json())
+    fetch(`${config.apiUrl}/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
+      .then((response) => response.json())
       .then((data) => {
-        setGrades(Array.isArray(data.data) ? data.data : [])
-        setTotal(data.total || 0)
+        setGrades(data.items)
+        setTotal(data.total)
+        setLoading(false)
       })
-      .catch(() => {
-        setGrades([])
-        setTotal(0)
+      .catch((error) => {
+        console.error("Error al cargar las calificaciones:", error)
+        setLoading(false)
       })
-      .finally(() => setLoading(false))
-  }, [currentPage])
+  }
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/alumnos")
-      .then((res) => res.json())
+    // Cargar alumnos
+    fetch(`${config.apiUrl}/alumnos`)
+      .then((response) => response.json())
       .then((data) => setAlumnos(Array.isArray(data) ? data.map((a: any) => ({ id: a.id, nombre: a.nombre })) : []))
-      .catch(() => setAlumnos([]))
-    fetch("http://localhost:5000/api/asignaturas")
-      .then((res) => res.json())
+      .catch((error) => console.error("Error al cargar los alumnos:", error))
+
+    // Cargar asignaturas
+    fetch(`${config.apiUrl}/asignaturas`)
+      .then((response) => response.json())
       .then((data) => setAsignaturas(Array.isArray(data) ? data.map((a: any) => ({ id: a.id, nombre: a.nombre })) : []))
-      .catch(() => setAsignaturas([]))
+      .catch((error) => console.error("Error al cargar las asignaturas:", error))
   }, [])
 
   // Refetch grades helper
-  const refetchGrades = async () => {
-    const res = await fetch(`http://localhost:5000/api/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
-    const data = await res.json()
-    setGrades(Array.isArray(data.data) ? data.data : [])
-    setTotal(data.total || 0)
+  const refreshGrades = async () => {
+    try {
+      const res = await fetch(`${config.apiUrl}/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
+      const data = await res.json()
+      setGrades(data.items)
+      setTotal(data.total)
+    } catch (error) {
+      console.error("Error al actualizar las calificaciones:", error)
+    }
   }
 
   // CRUD handlers
   const handleAddGrade = async (newGrade: any) => {
     setLoading(true)
     try {
-      const res = await fetch("http://localhost:5000/api/calificaciones", {
+      const res = await fetch(`${config.apiUrl}/calificaciones`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newGrade),
       })
       // Refetch para asegurar nombres correctos
-      await refetchGrades()
+      await refreshGrades()
       setIsAddDialogOpen(false)
       toast({ title: "Calificación agregada", description: `La calificación fue agregada exitosamente.`, variant: "success" })
-    } catch {
+    } catch (error) {
+      console.error("Error al agregar la calificación:", error)
       toast({ title: "Error", description: "No se pudo agregar la calificación.", variant: "destructive" })
     } finally {
       setLoading(false)
@@ -107,17 +120,18 @@ export function GradesTable() {
         periodo: selectedGrade.periodo,
         calificacion: updated.calificacion,
       }
-      const res = await fetch(`http://localhost:5000/api/calificaciones/${selectedGrade.id}`, {
+      const res = await fetch(`${config.apiUrl}/calificaciones/${selectedGrade.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       })
       if (!res.ok) throw new Error("Error en backend")
-      await refetchGrades()
+      await refreshGrades()
       setIsEditDialogOpen(false)
       setSelectedGrade(null)
       toast({ title: "Calificación actualizada", description: `La calificación fue actualizada exitosamente.`, variant: "success" })
-    } catch {
+    } catch (error) {
+      console.error("Error al actualizar la calificación:", error)
       toast({ title: "Error", description: "No se pudo actualizar la calificación.", variant: "destructive" })
     } finally {
       setLoading(false)
@@ -127,12 +141,13 @@ export function GradesTable() {
   const handleDeleteGrade = async (id: string) => {
     setLoading(true)
     try {
-      await fetch(`http://localhost:5000/api/calificaciones/${id}`, { method: "DELETE" })
-      await refetchGrades()
+      await fetch(`${config.apiUrl}/calificaciones/${id}`, { method: "DELETE" })
+      await refreshGrades()
       setIsDeleteDialogOpen(false)
       setSelectedGrade(null)
       toast({ title: "Calificación eliminada", description: `La calificación fue eliminada exitosamente.`, variant: "success" })
-    } catch {
+    } catch (error) {
+      console.error("Error al eliminar la calificación:", error)
       toast({ title: "Error", description: "No se pudo eliminar la calificación.", variant: "destructive" })
     } finally {
       setLoading(false)

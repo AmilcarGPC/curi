@@ -18,6 +18,7 @@ import { EditStudentDialog } from "./edit-student-dialog"
 import { DeleteStudentDialog } from "./delete-student-dialog"
 import { useToast } from "@/hooks/use-toast"
 import { motion, AnimatePresence } from "framer-motion"
+import { config } from "@/lib/config"
 
 export type Student = {
   id: string
@@ -65,11 +66,16 @@ export function StudentsTable() {
   // Fetch students from backend
   useEffect(() => {
     setLoading(true)
-    fetch("http://localhost:5000/api/alumnos")
-      .then((res) => res.json())
-      .then((data) => setStudents(data))
-      .catch(() => setStudents([]))
-      .finally(() => setLoading(false))
+    fetch(`${config.apiUrl}/alumnos`)
+      .then((response) => response.json())
+      .then((data) => {
+        setStudents(data)
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.error("Error al cargar los alumnos:", error)
+        setLoading(false)
+      })
   }, [])
 
   // Filter students based on search term
@@ -93,7 +99,7 @@ export function StudentsTable() {
   const handleAddStudent = async (newStudent: Omit<Student, "id">) => {
     setLoading(true)
     try {
-      const res = await fetch("http://localhost:5000/api/alumnos", {
+      const res = await fetch(`${config.apiUrl}/alumnos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newStudent),
@@ -117,7 +123,7 @@ export function StudentsTable() {
   const handleEditStudent = async (updatedStudent: Student) => {
     setLoading(true)
     try {
-      const res = await fetch(`http://localhost:5000/api/alumnos/${updatedStudent.id}`, {
+      const res = await fetch(`${config.apiUrl}/alumnos/${updatedStudent.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -147,7 +153,7 @@ export function StudentsTable() {
   const handleDeleteStudent = async (id: string) => {
     setLoading(true)
     try {
-      await fetch(`http://localhost:5000/api/alumnos/${id}`, { method: "DELETE" })
+      await fetch(`${config.apiUrl}/alumnos/${id}`, { method: "DELETE" })
       setStudents((prev) => prev.filter((s) => s.id !== id))
       setIsDeleteDialogOpen(false)
       setSelectedStudent(null)

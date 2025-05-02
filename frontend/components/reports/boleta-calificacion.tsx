@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { motion, AnimatePresence } from "framer-motion"
 import { Printer, Download, ChevronLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
+import { config } from "@/lib/config"
 
 // Sample student data
 const periodos = [
@@ -193,21 +194,34 @@ export function BoletaCalificacion() {
   // Fetch students for select
   const [students, setStudents] = useState<any[]>([])
   useEffect(() => {
-    fetch("http://localhost:5000/api/alumnos")
+    setLoading(true)
+    fetch(`${config.apiUrl}/alumnos`)
       .then((res) => res.json())
-      .then((data) => setStudents(data))
-      .catch(() => setStudents([]))
+      .then((data) => {
+        setStudents(data)
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.error("Error al cargar los alumnos:", error)
+        setLoading(false)
+      })
   }, [])
 
   // Fetch boleta when student or periodo changes
   useEffect(() => {
-    if (!selectedStudent) return
-    setLoading(true)
-    fetch(`http://localhost:5000/api/reportes/boleta/${selectedStudent}?periodo=${selectedPeriodo}`)
-      .then((res) => res.json())
-      .then((data) => setBoleta(data))
-      .catch(() => setBoleta(null))
-      .finally(() => setLoading(false))
+    if (selectedStudent && selectedPeriodo) {
+      setLoading(true)
+      fetch(`${config.apiUrl}/reportes/boleta/${selectedStudent}?periodo=${selectedPeriodo}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setBoleta(data)
+          setLoading(false)
+        })
+        .catch((error) => {
+          console.error("Error al cargar el reporte:", error)
+          setLoading(false)
+        })
+    }
   }, [selectedStudent, selectedPeriodo])
 
   const [isFlipping, setIsFlipping] = useState(false)
