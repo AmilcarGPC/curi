@@ -51,9 +51,22 @@ export function GradesTable() {
     fetch(`${config.apiUrl}/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
       .then((response) => response.json())
       .then((data) => {
-        // Asegurarse de que data.items sea siempre un array
-        setGrades(Array.isArray(data?.items) ? data.items : []);
-        setTotal(data?.total || 0);
+        console.log("Datos recibidos del backend:", data);
+        // Manejar tanto respuesta paginada como array directo
+        if (Array.isArray(data)) {
+          // Si es un array directo
+          setGrades(data);
+          setTotal(data.length);
+        } else if (data?.items && Array.isArray(data.items)) {
+          // Si es un objeto con estructura paginada
+          setGrades(data.items);
+          setTotal(data.total || 0);
+        } else {
+          // Si es otro tipo de respuesta, intentar extraer datos
+          const extractedData = data?.data || data || [];
+          setGrades(Array.isArray(extractedData) ? extractedData : []);
+          setTotal(extractedData.length || 0);
+        }
         setLoading(false);
       })
       .catch((error) => {
@@ -84,9 +97,23 @@ export function GradesTable() {
     try {
       const res = await fetch(`${config.apiUrl}/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
       const data = await res.json()
-      // Asegurarse de que data.items sea siempre un array
-      setGrades(Array.isArray(data?.items) ? data.items : [])
-      setTotal(data?.total || 0)
+      console.log("Datos recibidos en refreshGrades:", data);
+      
+      // Usar la misma lógica que en fetchGrades para manejar distintos formatos de respuesta
+      if (Array.isArray(data)) {
+        // Si es un array directo
+        setGrades(data);
+        setTotal(data.length);
+      } else if (data?.items && Array.isArray(data.items)) {
+        // Si es un objeto con estructura paginada
+        setGrades(data.items);
+        setTotal(data.total || 0);
+      } else {
+        // Si es otro tipo de respuesta, intentar extraer datos
+        const extractedData = data?.data || data || [];
+        setGrades(Array.isArray(extractedData) ? extractedData : []);
+        setTotal(extractedData.length || 0);
+      }
     } catch (error) {
       console.error("Error al actualizar las calificaciones:", error)
       // En caso de error, establecer un array vacío
@@ -164,10 +191,27 @@ export function GradesTable() {
 
   // Asegurarse de que grades siempre sea un array antes de filtrar
   const filteredGrades = (grades || []).filter(
-    (grade) =>
-      (grade?.alumno?.toLowerCase?.().includes(searchTerm.toLowerCase()) || "") ||
-      (grade?.asignatura?.toLowerCase?.().includes(searchTerm.toLowerCase()) || "") ||
-      String(grade?.calificacion || "").includes(searchTerm)
+    (grade) => {
+      if (!grade) return false;
+      
+      // Búsqueda por nombre de alumno (podría estar en diferentes propiedades)
+      const alumnoMatch = 
+        (typeof grade.alumno === 'string' && grade.alumno.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (typeof grade.alumno_nombre === 'string' && grade.alumno_nombre.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (typeof grade.alumno_id === 'string' && grade.alumno_id.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      // Búsqueda por nombre de asignatura (podría estar en diferentes propiedades)
+      const asignaturaMatch = 
+        (typeof grade.asignatura === 'string' && grade.asignatura.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (typeof grade.asignatura_nombre === 'string' && grade.asignatura_nombre.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (typeof grade.asignatura_id === 'string' && grade.asignatura_id.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      // Búsqueda por calificación
+      const calificacionMatch = 
+        (grade.calificacion !== undefined && String(grade.calificacion).includes(searchTerm));
+      
+      return !searchTerm || alumnoMatch || asignaturaMatch || calificacionMatch;
+    }
   )
   const indexOfLastGrade = currentPage * pageSize
   const indexOfFirstGrade = indexOfLastGrade - pageSize
