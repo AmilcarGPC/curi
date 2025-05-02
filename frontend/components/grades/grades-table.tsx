@@ -51,14 +51,18 @@ export function GradesTable() {
     fetch(`${config.apiUrl}/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
       .then((response) => response.json())
       .then((data) => {
-        setGrades(data.items)
-        setTotal(data.total)
-        setLoading(false)
+        // Asegurarse de que data.items sea siempre un array
+        setGrades(Array.isArray(data?.items) ? data.items : []);
+        setTotal(data?.total || 0);
+        setLoading(false);
       })
       .catch((error) => {
-        console.error("Error al cargar las calificaciones:", error)
-        setLoading(false)
-      })
+        console.error("Error al cargar las calificaciones:", error);
+        // En caso de error, establecer un array vacío
+        setGrades([]);
+        setTotal(0);
+        setLoading(false);
+      });
   }
 
   useEffect(() => {
@@ -75,15 +79,19 @@ export function GradesTable() {
       .catch((error) => console.error("Error al cargar las asignaturas:", error))
   }, [])
 
-  // Refetch grades helper
+  // Refetch grades helper con mejor manejo de errores
   const refreshGrades = async () => {
     try {
       const res = await fetch(`${config.apiUrl}/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
       const data = await res.json()
-      setGrades(data.items)
-      setTotal(data.total)
+      // Asegurarse de que data.items sea siempre un array
+      setGrades(Array.isArray(data?.items) ? data.items : [])
+      setTotal(data?.total || 0)
     } catch (error) {
       console.error("Error al actualizar las calificaciones:", error)
+      // En caso de error, establecer un array vacío
+      setGrades([])
+      setTotal(0)
     }
   }
 
@@ -154,11 +162,12 @@ export function GradesTable() {
     }
   }
 
-  const filteredGrades = grades.filter(
+  // Asegurarse de que grades siempre sea un array antes de filtrar
+  const filteredGrades = (grades || []).filter(
     (grade) =>
-      (grade.alumno?.toLowerCase?.().includes(searchTerm.toLowerCase()) || "") ||
-      (grade.asignatura?.toLowerCase?.().includes(searchTerm.toLowerCase()) || "") ||
-      String(grade.calificacion).includes(searchTerm)
+      (grade?.alumno?.toLowerCase?.().includes(searchTerm.toLowerCase()) || "") ||
+      (grade?.asignatura?.toLowerCase?.().includes(searchTerm.toLowerCase()) || "") ||
+      String(grade?.calificacion || "").includes(searchTerm)
   )
   const indexOfLastGrade = currentPage * pageSize
   const indexOfFirstGrade = indexOfLastGrade - pageSize
