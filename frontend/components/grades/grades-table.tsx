@@ -43,7 +43,7 @@ export function GradesTable() {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`http://localhost:4000/api/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
+    fetch(`http://localhost:5000/api/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
       .then((res) => res.json())
       .then((data) => {
         setGrades(Array.isArray(data.data) ? data.data : [])
@@ -57,11 +57,11 @@ export function GradesTable() {
   }, [currentPage])
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/alumnos")
+    fetch("http://localhost:5000/api/alumnos")
       .then((res) => res.json())
       .then((data) => setAlumnos(Array.isArray(data) ? data.map((a: any) => ({ id: a.id, nombre: a.nombre })) : []))
       .catch(() => setAlumnos([]))
-    fetch("http://localhost:4000/api/asignaturas")
+    fetch("http://localhost:5000/api/asignaturas")
       .then((res) => res.json())
       .then((data) => setAsignaturas(Array.isArray(data) ? data.map((a: any) => ({ id: a.id, nombre: a.nombre })) : []))
       .catch(() => setAsignaturas([]))
@@ -69,7 +69,7 @@ export function GradesTable() {
 
   // Refetch grades helper
   const refetchGrades = async () => {
-    const res = await fetch(`http://localhost:4000/api/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
+    const res = await fetch(`http://localhost:5000/api/calificaciones?page=${currentPage}&pageSize=${pageSize}`)
     const data = await res.json()
     setGrades(Array.isArray(data.data) ? data.data : [])
     setTotal(data.total || 0)
@@ -79,7 +79,7 @@ export function GradesTable() {
   const handleAddGrade = async (newGrade: any) => {
     setLoading(true)
     try {
-      const res = await fetch("http://localhost:4000/api/calificaciones", {
+      const res = await fetch("http://localhost:5000/api/calificaciones", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newGrade),
@@ -107,7 +107,7 @@ export function GradesTable() {
         periodo: selectedGrade.periodo,
         calificacion: updated.calificacion,
       }
-      const res = await fetch(`http://localhost:4000/api/calificaciones/${selectedGrade.id}`, {
+      const res = await fetch(`http://localhost:5000/api/calificaciones/${selectedGrade.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -127,7 +127,7 @@ export function GradesTable() {
   const handleDeleteGrade = async (id: string) => {
     setLoading(true)
     try {
-      await fetch(`http://localhost:4000/api/calificaciones/${id}`, { method: "DELETE" })
+      await fetch(`http://localhost:5000/api/calificaciones/${id}`, { method: "DELETE" })
       await refetchGrades()
       setIsDeleteDialogOpen(false)
       setSelectedGrade(null)

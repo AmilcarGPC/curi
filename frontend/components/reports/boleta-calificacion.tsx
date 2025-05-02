@@ -193,7 +193,7 @@ export function BoletaCalificacion() {
   // Fetch students for select
   const [students, setStudents] = useState<any[]>([])
   useEffect(() => {
-    fetch("http://localhost:4000/api/alumnos")
+    fetch("http://localhost:5000/api/alumnos")
       .then((res) => res.json())
       .then((data) => setStudents(data))
       .catch(() => setStudents([]))
@@ -203,7 +203,7 @@ export function BoletaCalificacion() {
   useEffect(() => {
     if (!selectedStudent) return
     setLoading(true)
-    fetch(`http://localhost:4000/api/reportes/boleta/${selectedStudent}?periodo=${selectedPeriodo}`)
+    fetch(`http://localhost:5000/api/reportes/boleta/${selectedStudent}?periodo=${selectedPeriodo}`)
       .then((res) => res.json())
       .then((data) => setBoleta(data))
       .catch(() => setBoleta(null))

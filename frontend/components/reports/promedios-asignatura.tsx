@@ -37,7 +37,7 @@ export function PromediosAsignatura() {
 
   useEffect(() => {
     setLoading(true)
-    const url = `http://localhost:4000/api/reportes/promedios-asignatura?periodo=${periodo}&grado=${grado}`
+    const url = `http://localhost:5000/api/reportes/promedios-asignatura?periodo=${periodo}&grado=${grado}`
     fetch(url)
       .then((res) => res.json())
       .then((res) => Array.isArray(res) ? setData(res.filter(d => grado === "all" || String(d.grado) === String(grado))) : setData([]))

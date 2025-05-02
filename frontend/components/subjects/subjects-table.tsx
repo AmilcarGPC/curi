@@ -60,7 +60,7 @@ export function SubjectsTable() {
 
   // Fetch resumen de asignaturas (alumnos y promedio del último periodo)
   useEffect(() => {
-    fetch("http://localhost:4000/api/asignaturas/resumen")
+    fetch("http://localhost:5000/api/asignaturas/resumen")
       .then((res) => res.json())
       .then((data) => Array.isArray(data) ? setSubjects(data) : setSubjects([]))
       .catch(() => setSubjects([]))
@@ -81,7 +81,7 @@ export function SubjectsTable() {
   // CRUD handlers
   const handleAddSubject = async (newSubject: Omit<Subject, "id">) => {
     try {
-      const res = await fetch("http://localhost:4000/api/asignaturas", {
+      const res = await fetch("http://localhost:5000/api/asignaturas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newSubject),
@@ -97,7 +97,7 @@ export function SubjectsTable() {
 
   const handleEditSubject = async (updatedSubject: Subject) => {
     try {
-      const res = await fetch(`http://localhost:4000/api/asignaturas/${updatedSubject.id}`, {
+      const res = await fetch(`http://localhost:5000/api/asignaturas/${updatedSubject.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre: updatedSubject.nombre, grado: updatedSubject.grado }),
@@ -114,7 +114,7 @@ export function SubjectsTable() {
 
   const handleDeleteSubject = async (id: string) => {
     try {
-      await fetch(`http://localhost:4000/api/asignaturas/${id}`, { method: "DELETE" })
+      await fetch(`http://localhost:5000/api/asignaturas/${id}`, { method: "DELETE" })
       setSubjects((prev) => prev.filter((s) => s.id !== id))
       setIsDeleteDialogOpen(false)
       setSelectedSubject(null)

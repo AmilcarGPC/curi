@@ -39,7 +39,7 @@ export function AlumnosRegularidad() {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`http://localhost:4000/api/reportes/alumnos-regularidad?periodo=${periodo}`)
+    fetch(`http://localhost:5000/api/reportes/alumnos-regularidad?periodo=${periodo}`)
       .then((res) => res.json())
       .then(setAlumnos)
       .catch(() => setAlumnos([]))

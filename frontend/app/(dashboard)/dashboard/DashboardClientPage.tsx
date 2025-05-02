@@ -20,9 +20,9 @@ export default function DashboardClientPage() {
   useEffect(() => {
     setLoading(true)
     Promise.all([
-      fetch("http://localhost:4000/api/alumnos").then(res => res.json()),
-      fetch("http://localhost:4000/api/asignaturas").then(res => res.json()),
-      fetch("http://localhost:4000/api/calificaciones/promedio-ultimo-periodo").then(res => res.json()),
+      fetch("http://localhost:5000/api/alumnos").then(res => res.json()),
+      fetch("http://localhost:5000/api/asignaturas").then(res => res.json()),
+      fetch("http://localhost:5000/api/calificaciones/promedio-ultimo-periodo").then(res => res.json()),
     ])
       .then(([alumnos, asignaturas, promedio]) => {
         setTotalStudents(alumnos?.length?.toString() ?? "—")
