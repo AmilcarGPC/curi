@@ -18,9 +18,10 @@ RUN npm run build
 # Configuración de producción
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3006
 
 # Exponer el puerto en el que se ejecutará la aplicación
-EXPOSE 3000
+EXPOSE 3006
 
 # Comando para iniciar la aplicación
 CMD ["npm", "start"]
