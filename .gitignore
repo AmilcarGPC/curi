@@ -4,12 +4,12 @@ node_modules
 .pnp.js
 
 # Variables de entorno
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env*.local
+#.env
+#.env.local
+#.env.development.local
+#.env.test.local
+#.env.production.local
+#.env*.local
 
 # Archivos de registro
 npm-debug.log*
