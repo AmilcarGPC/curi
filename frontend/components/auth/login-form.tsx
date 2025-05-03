@@ -97,7 +97,7 @@ export function LoginForm() {
         <span className="text-white">Recordarme</span>
       </label>
       <a href="/forgot-password" className="text-[#C09913] hover:underline">
-        ¿Olvidaste tu contraseña?
+        ¿Olvidaste contraseña?
       </a>
     </div>
 

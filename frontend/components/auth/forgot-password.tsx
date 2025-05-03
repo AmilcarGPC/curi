@@ -66,7 +66,7 @@ export function PasswordResetForm() {
       ) : (
         <>
           <div className="space-y-2 text-center">
-            <h2 className="text-lg font-medium">¿Olvidaste tu contraseña?</h2>
+            <h2 className="text-lg font-medium">¿Olvidaste contraseña?</h2>
             <p className="text-muted-foreground">
               Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
             </p>
