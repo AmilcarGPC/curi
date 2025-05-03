@@ -9,6 +9,7 @@ import { PageTransition } from "@/components/ui/page-transition"
 import { motion } from "framer-motion"
 import { ArrowUp, ArrowDown, Users, BookOpen, GraduationCap, UserCheck } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { config } from "@/lib/config"
 
 export default function DashboardClientPage() {
   const [averageGrade, setAverageGrade] = useState<string | null>(null)
@@ -20,9 +21,9 @@ export default function DashboardClientPage() {
   useEffect(() => {
     setLoading(true)
     Promise.all([
-      fetch("http://localhost:5000/api/alumnos").then(res => res.json()),
-      fetch("http://localhost:5000/api/asignaturas").then(res => res.json()),
-      fetch("http://localhost:5000/api/calificaciones/promedio-ultimo-periodo").then(res => res.json()),
+      fetch(`${config.apiUrl}/alumnos`).then(res => res.json()),
+      fetch(`${config.apiUrl}/asignaturas`).then(res => res.json()),
+      fetch(`${config.apiUrl}/calificaciones/promedio-ultimo-periodo`).then(res => res.json()),
     ])
       .then(([alumnos, asignaturas, promedio]) => {
         setTotalStudents(alumnos?.length?.toString() ?? "—")
