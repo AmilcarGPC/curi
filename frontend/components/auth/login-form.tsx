@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import { InputConIcono } from "@/components/ui/input_con_icono"
 import { toast } from "@/hooks/use-toast"
 import { supabase } from "@/lib/supabaseClient"
 
@@ -63,9 +63,11 @@ export function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Correo Electrónico</FormLabel>
               <FormControl>
-                <Input placeholder="nombre@escuela.edu" {...field} />
+                <InputConIcono  
+                placeholder="Usuario"
+                icon={<img src="/Usuario_Vector.svg" alt="User Icon" className="w-6 h-6" />}
+                {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -76,16 +78,33 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contraseña</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
+              <InputConIcono  
+                type="password"
+                placeholder="Contraseña"
+                icon={<img src="/Contraseña_Vector.png" alt="User Icon"  />}
+                {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+
+         {/* Checkbox + Link */}
+    <div className="flex items-center justify-between text-sm">
+      <label className="flex items-center gap-2">
+        <input type="checkbox" className="accent-[#C09913] w-4 h-4" />
+        <span className="text-white">Recordarme</span>
+      </label>
+      <a href="/forgot-password" className="text-[#C09913] hover:underline">
+        ¿Olvidaste tu contraseña?
+      </a>
+    </div>
+
+        <Button type="submit" 
+          className="w-full bg-[#C09913] hover:bg-[#b58a10] text-white text-xl rounded-2x1 py-4" 
+          disabled={isLoading}>
+          {isLoading ? "Iniciando sesión..." : "Ingresar"}
         </Button>
       </form>
     </Form>
