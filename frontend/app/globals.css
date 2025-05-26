@@ -112,6 +112,11 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  html, body {
+    background: #fff !important;
+    color-scheme: light !important;
+  }
 }
 
 /* Custom animations */
