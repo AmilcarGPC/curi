@@ -25,109 +25,45 @@ export function DashboardHeader() {
   const [showSearch, setShowSearch] = useState(false)
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
-      <div className="flex items-center gap-2 md:gap-4">
-        {isMobile && <SidebarTrigger />}
+    <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between bg-[#07346B] border-b-4 border-[#C09913] shadow-md px-0">
+      {/* Logo a la izquierda */}
+      <div className="flex items-center h-full px-6 min-w-[220px]">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <motion.div whileHover={{ rotate: 5 }} transition={{ duration: 0.2 }}>
-            <Image
-              src="/placeholder.svg?height=32&width=32"
-              alt="Logo de la escuela"
-              width={32}
-              height={32}
-              className="rounded-md"
-            />
-          </motion.div>
-          <span className="hidden font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent md:inline-block">
-            Primaria
-          </span>
+          <span className="text-white font-extrabold text-2xl tracking-widest">PRIMAUADY</span>
         </Link>
       </div>
 
-      {/* Search bar - hidden on mobile unless activated */}
-      <div className={`${isMobile && !showSearch ? "hidden" : "flex"} flex-1 items-center gap-4 md:gap-8`}>
-        <form className="flex-1 sm:flex-initial">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
+      {/* Search bar centrado */}
+      <div className="flex-1 flex justify-center items-center h-full">
+        <form className="w-full max-w-xl flex justify-center">
+          <div className="relative w-full">
+            <input
               type="search"
-              placeholder="Buscar..."
-              className="w-full rounded-lg bg-background pl-8 md:w-[300px] lg:w-[400px] focus-visible-ring"
+              placeholder="¿Qué deseas encontrar?"
+              className="w-full rounded-full bg-white text-black px-12 py-2 shadow focus:outline-none focus:ring-2 focus:ring-[#C09913] border-none text-base transition-all duration-150 placeholder:text-[#07346B]/70"
               aria-label="Buscar"
+              style={{ boxShadow: '0 2px 8px 0 rgba(7,52,107,0.08)' }}
             />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#07346B]" />
+            <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-[#07346B] text-xl font-bold focus:outline-none">×</button>
           </div>
         </form>
       </div>
 
-      <div className="ml-auto flex items-center gap-3">
-        {isMobile && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 focus-visible-ring btn-hover-effect"
-            onClick={() => setShowSearch(!showSearch)}
-            aria-label="Toggle search"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-        )}
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 focus-visible-ring btn-hover-effect relative"
-              aria-label="Notifications"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-0 right-0 h-2 w-2 rounded-full " aria-hidden="true"></span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>Notificaciones</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="max-h-80 overflow-auto">
-              {[1, 2, 3].map((i) => (
-                <DropdownMenuItem key={i} className="flex flex-col items-start p-3 cursor-pointer">
-                  <div className="font-medium">Nueva calificación agregada</div>
-                  <div className="text-sm text-muted-foreground">Examen de Matemáticas para Alex Chen</div>
-                  <div className="text-xs text-muted-foreground mt-1">hace 2 horas</div>
-                </DropdownMenuItem>
-              ))}
-            </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="justify-center font-medium text-primary">
-              Ver todas las notificaciones
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <ThemeToggle />
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full focus-visible-ring">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end" forceMount>
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Juan Pérez</p>
-                <p className="text-xs leading-none text-muted-foreground">juan.perez@escuela.edu</p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Perfil</DropdownMenuItem>
-            <DropdownMenuItem>Configuración</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Cerrar sesión</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      {/* Notificación y avatar a la derecha */}
+      <div className="flex items-center gap-4 h-full px-6 min-w-[120px] justify-end">
+        <Button variant="ghost" size="icon" className="relative h-8 w-8 focus-visible-ring">
+          <Bell className="h-5 w-5 text-white" />
+          <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full border-2 border-[#07346B] bg-white flex items-center justify-center">
+            <span className="block w-2 h-2 bg-red-600 rounded-full"></span>
+          </span>
+        </Button>
+        <Button variant="ghost" size="icon" className="relative h-8 w-8 rounded-full focus-visible-ring">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src="/placeholder-user.jpg" alt="User" />
+            <AvatarFallback>N</AvatarFallback>
+          </Avatar>
+        </Button>
       </div>
     </header>
   )

@@ -35,14 +35,22 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     const { email, password } = values
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
     setIsLoading(false)
     if (error) {
+      let customMessage = "Error de autenticación"
+      if (error.message.includes("Invalid login credentials")) {
+        customMessage = "Correo o contraseña incorrectos. Si no has verificado tu cuenta, revisa tu correo.";
+      } else if (error.message.includes("User not found")) {
+        customMessage = "El usuario no existe."
+      } else if (error.message.includes("email")) {
+        customMessage = "El correo electrónico no es válido."
+      }
       toast({
-        title: "Error de autenticación",
+        title: customMessage,
         description: error.message,
         variant: "destructive",
       })

@@ -47,10 +47,13 @@ export function RegisterForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    const { email, password } = values
+    const { email, password, name } = values
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: { name },
+      },
     })
     setIsLoading(false)
     if (error) {
@@ -76,9 +79,9 @@ export function RegisterForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre</FormLabel>
+              <FormLabel className="text-white">Nombre</FormLabel>
               <FormControl>
-                <Input placeholder="Juan Pérez" {...field} />
+                <Input className="text-white placeholder-white" placeholder="Juan Pérez" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,9 +92,9 @@ export function RegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Correo Electrónico</FormLabel>
+              <FormLabel className="text-white">Correo Electrónico</FormLabel>
               <FormControl>
-                <Input placeholder="nombre@escuela.edu" {...field} />
+                <Input className="text-white placeholder-white" placeholder="nombre@escuela.edu" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -102,9 +105,9 @@ export function RegisterForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contraseña</FormLabel>
+              <FormLabel className="text-white">Contraseña</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
+                <Input type="password" className="text-white placeholder-white" placeholder="••••••••" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -115,17 +118,19 @@ export function RegisterForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirmar Contraseña</FormLabel>
+              <FormLabel className="text-white">Confirmar Contraseña</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
+                <Input type="password" className="text-white placeholder-white" placeholder="••••••••" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" 
-              className="w-full bg-[#C09913] hover:bg-[#b58a10] text-white text-xl rounded-2x1 py-4" 
-              disabled={isLoading}>
+        <Button
+          type="submit"
+          className="w-full bg-[#C09913] hover:bg-[#b58a10] text-white text-xl rounded-2x1 py-4"
+          disabled={isLoading}
+        >
           {isLoading ? "Creando cuenta..." : "Crear Cuenta"}
         </Button>
       </form>

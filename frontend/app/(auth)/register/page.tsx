@@ -13,8 +13,8 @@ export default function RegisterPage() {
       <div style={{ borderColor: '#C09913' }} className="border-2 rounded-xl p-8 backdrop-blur-sm bg-black/10 shadow-lg">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Crear una cuenta</h1>
-          <p className="text-sm text-muted-foreground">Ingresa tu información para crear una cuenta</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Crear una cuenta</h1>
+          <p className="text-sm text-white">Ingresa tu información para crear una cuenta</p>
         </div>
         <RegisterForm />
         <p className="px-8 text-center text-sm text-muted-foreground">
