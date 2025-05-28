@@ -41,8 +41,11 @@ export default function ForgotPasswordPage() {
     const { email } = values;
 
     // Llamada a la API de Supabase para enviar el correo de recuperación
+    const redirectTo = process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`
+      : `${window.location.origin}/reset-password`;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`, // URL a la que será redirigido el usuario
+      redirectTo,
     });
 
     setIsLoading(false);
