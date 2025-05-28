@@ -17,7 +17,7 @@ export default function SubjectsPage() {
         ]}
       />
 
-      <div className="py-4 w-full">
+      <div className="flex-col items-center ">
         <h1 className="mb-6 text-3xl font-bold">Asignaturas</h1>
         <SubjectsTable />
       </div>

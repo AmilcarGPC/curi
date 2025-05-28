@@ -54,24 +54,28 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen flex-col bg-white min-w-0">
+      <div className="flex-1 flex items-stretch flex-col bg-white ">
         <DashboardHeader />
-        <div className="flex flex-1 min-w-0">
+        <div className="flex flex-1 inset-0 flex overflow-x-hidden">
           <DashboardSidebar />
-          <main className="flex-1 p-4 md:p-6 overflow-auto min-w-0">
-            <div className="mb-8">
-              <div className="rounded-2xl shadow-lg bg-gradient-to-r from-[#C09913] to-[#9e811e] p-8 flex flex-col md:flex-row md:items-center md:justify-between">
-                <div className="flex flex-col justify-center w-full md:w-auto">
-                  <h1 className="text-3xl font-bold text-white mb-2 text-center md:text-left">{title}</h1>
-                  <p className="text-white text-lg text-center md:text-left">{subtitle}</p>
+          <main className="flex-1 items-center flex-col overflow-x-hidden overflow-y-auto px-4 py-4">
+            <div className="mb-8 w-full">
+              <div className="rounded-2xl shadow-lg bg-gradient-to-r from-[#C09913] to-[#9e811e] p-8">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full">
+                  <div className="flex flex-col justify-center w-full md:w-auto">
+                    <h1 className="text-3xl font-bold text-white mb-2 text-center md:text-left">{title}</h1>
+                    <p className="text-white text-lg text-center md:text-left">{subtitle}</p>
+                  </div>
+                  {/* Logo dorado solo en dashboard */}
+                  {pathname === "/dashboard" && (
+                    <img src="/logo_uady_dorado.png" alt="Logo UADY" className="h-50 hidden md:block filter invert brightness-0 ml-0 md:ml-8" />
+                  )}
                 </div>
-                {/* Logo dorado solo en dashboard */}
-                {pathname === "/dashboard" && (
-                  <img src="/logo_uady_dorado.png" alt="Logo UADY" className="h-20 hidden md:block filter invert brightness-0 ml-0 md:ml-8" />
-                )}
               </div>
             </div>
-            {children}
+            <div className="">{/* Centra y da padding lateral y vertical al contenido */}
+              {children}
+            </div>
           </main>
         </div>
       </div>

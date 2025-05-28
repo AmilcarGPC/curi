@@ -183,7 +183,7 @@ export function StudentsTable() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="relative">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex w-full max-w-sm items-center space-x-2">
           <div className="relative flex-1">
@@ -213,8 +213,8 @@ export function StudentsTable() {
         </motion.div>
       </div>
 
-      <div className="rounded-md border bg-card">
-        <Table>
+      <div className="rounded-md border bg-card overflow-x-auto w-full h-full">
+        <Table className="w-full h-full ">
           <TableHeader>
             <TableRow>
               <TableHead>Matrícula</TableHead>

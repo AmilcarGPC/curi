@@ -219,7 +219,7 @@ export function GradesTable() {
   const totalPages = Math.ceil(filteredGrades.length / pageSize)
 
   return (
-    <div className="space-y-4">
+    <div className=" relative">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex w-full max-w-sm items-center space-x-2">
           <div className="relative flex-1">
@@ -239,15 +239,16 @@ export function GradesTable() {
         </Button>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
+      {/* Tabla expandida y legible */}
+      <div className=" w-full">
+        <Table className="min-w-[1600px] w-full max-w-full text-base">
           <TableHeader>
             <TableRow>
-              <TableHead>Alumno</TableHead>
-              <TableHead>Asignatura</TableHead>
-              <TableHead>Calificación</TableHead>
-              <TableHead>Periodo</TableHead>
-              <TableHead className="w-[80px]"></TableHead>
+              <TableHead className="px-6 py-4 text-lg">Alumno</TableHead>
+              <TableHead className="px-6 py-4 text-lg">Asignatura</TableHead>
+              <TableHead className="px-6 py-4 text-lg">Calificación</TableHead>
+              <TableHead className="px-6 py-4 text-lg">Periodo</TableHead>
+              <TableHead className="px-6 py-4 w-[120px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -271,11 +272,11 @@ export function GradesTable() {
                     }}
                     className="table-row-hover"
                   >
-                    <TableCell>{grade.alumno || grade.alumno_id}</TableCell>
-                    <TableCell>{grade.asignatura || grade.asignatura_id}</TableCell>
-                    <TableCell>{grade.calificacion} %</TableCell>
-                    <TableCell>{periodos.find((p) => p.value === grade.periodo)?.label || grade.periodo}</TableCell>
-                    <TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-base">{grade.alumno || grade.alumno_id}</TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-base">{grade.asignatura || grade.asignatura_id}</TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-base">{grade.calificacion} %</TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-base">{periodos.find((p) => p.value === grade.periodo)?.label || grade.periodo}</TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-base">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
