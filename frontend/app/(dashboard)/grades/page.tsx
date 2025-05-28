@@ -12,13 +12,13 @@ export default function GradesPage() {
     <div className="space-y-6">
       <DashboardBreadcrumb
         items={[
-          { title: "Dashboard", href: "/dashboard" },
-          { title: "Grades", href: "/grades" },
+          { title: "Panel", href: "/dashboard" },
+          { title: "Calificaciones", href: "/grades" },
         ]}
       />
 
-      <div className="container mx-auto py-4">
-        <h1 className="mb-6 text-3xl font-bold">Grades</h1>
+      <div className="py-4 w-full">
+        <h1 className="mb-6 text-3xl font-bold">Calificaciones</h1>
         <GradesTable />
       </div>
     </div>

@@ -54,11 +54,11 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col bg-white min-w-0">
         <DashboardHeader />
-        <div className="flex flex-1">
+        <div className="flex flex-1 min-w-0">
           <DashboardSidebar />
-          <main className="flex-1 p-4 md:p-6 overflow-auto">
+          <main className="flex-1 p-4 md:p-6 overflow-auto min-w-0">
             <div className="mb-8">
               <div className="rounded-2xl shadow-lg bg-gradient-to-r from-[#C09913] to-[#9e811e] p-8 flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="flex flex-col justify-center w-full md:w-auto">

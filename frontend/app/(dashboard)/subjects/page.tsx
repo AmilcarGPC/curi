@@ -12,13 +12,13 @@ export default function SubjectsPage() {
     <div className="space-y-6">
       <DashboardBreadcrumb
         items={[
-          { title: "Dashboard", href: "/dashboard" },
-          { title: "Subjects", href: "/subjects" },
+          { title: "Panel", href: "/dashboard" },
+          { title: "Asignaturas", href: "/subjects" },
         ]}
       />
 
-      <div className="container mx-auto py-4">
-        <h1 className="mb-6 text-3xl font-bold">Subjects</h1>
+      <div className="py-4 w-full">
+        <h1 className="mb-6 text-3xl font-bold">Asignaturas</h1>
         <SubjectsTable />
       </div>
     </div>

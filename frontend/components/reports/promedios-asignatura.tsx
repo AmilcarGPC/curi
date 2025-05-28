@@ -116,7 +116,14 @@ export function PromediosAsignatura() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="nombre" angle={-45} textAnchor="end" height={70} tick={{ fontSize: 12 }} />
+                    <XAxis 
+                      dataKey="nombre" 
+                      angle={-45} 
+                      textAnchor="end" 
+                      height={70} 
+                      tick={{ fontSize: 12, width: 80, wordBreak: 'break-all' }}
+                      tickFormatter={(value: string) => value.length > 14 ? value.slice(0, 12) + '…' : value}
+                    />
                     <YAxis domain={[0, 100]} />
                     <Tooltip formatter={(value, name) => [`${value}%`, name === 'previo' ? 'Trimestre anterior' : 'Promedio']} labelStyle={{ fontWeight: "bold" }} />
                     <Legend />

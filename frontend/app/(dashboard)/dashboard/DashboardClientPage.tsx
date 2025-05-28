@@ -47,7 +47,7 @@ export default function DashboardClientPage() {
 
   const statCards = [
     {
-      title: "Total Students",
+      title: "Total de Estudiantes",
       value: loading ? "..." : totalStudents ?? "—",
       change: "",
       changeText: "",
@@ -55,7 +55,7 @@ export default function DashboardClientPage() {
       trend: "up",
     },
     {
-      title: "Average Grade",
+      title: "Promedio General",
       value: loading ? "..." : averageGrade ?? "—",
       change: averagePeriod ? averagePeriod : "",
       changeText: "último periodo completo",
@@ -63,7 +63,7 @@ export default function DashboardClientPage() {
       trend: "up",
     },
     {
-      title: "Subjects",
+      title: "Total de Asignaturas",
       value: loading ? "..." : totalSubjects ?? "—",
       change: "",
       changeText: "",
@@ -71,7 +71,7 @@ export default function DashboardClientPage() {
       trend: "up",
     },
     {
-      title: "Teachers",
+      title: "Total de Docentes",
       value: "—",
       change: "",
       changeText: "",
@@ -98,7 +98,7 @@ export default function DashboardClientPage() {
   return (
     <PageTransition>
       <div className="space-y-6">
-        <DashboardBreadcrumb items={[{ title: "Dashboard", href: "/dashboard" }]} />
+        <DashboardBreadcrumb items={[{ title: "Inicio", href: "/dashboard" }]} />
 
         <motion.div
           className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
@@ -145,8 +145,8 @@ export default function DashboardClientPage() {
           >
             <Card>
               <CardHeader>
-                <CardTitle>Performance Overview</CardTitle>
-                <CardDescription>Average grades across all subjects for the current semester</CardDescription>
+                <CardTitle>Resumen de desempeño</CardTitle>
+                <CardDescription>Promedios de todas las asignaturas del trimestre actual</CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
                 <Overview />
@@ -162,8 +162,8 @@ export default function DashboardClientPage() {
           >
             <Card>
               <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Latest updates and grade entries</CardDescription>
+                <CardTitle>Actividad reciente</CardTitle>
+                <CardDescription>Últimos movimientos y registros de calificaciones</CardDescription>
               </CardHeader>
               <CardContent>
                 <RecentActivity />

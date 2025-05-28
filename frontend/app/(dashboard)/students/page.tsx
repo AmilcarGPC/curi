@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function StudentsPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full min-w-0">
       <DashboardBreadcrumb
         items={[
           { title: "Panel", href: "/dashboard" },
@@ -17,7 +17,7 @@ export default function StudentsPage() {
         ]}
       />
 
-      <div className="container mx-auto py-4">
+      <div className="py-4 w-full min-w-0">
         <h1 className="mb-6 text-3xl font-bold">Alumnos</h1>
         <StudentsTable />
       </div>
