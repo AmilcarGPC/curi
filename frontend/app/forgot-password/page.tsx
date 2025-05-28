@@ -40,10 +40,19 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
     const { email } = values;
 
-    // Llamada a la API de Supabase para enviar el correo de recuperación
-    const redirectTo = process.env.NEXT_PUBLIC_SITE_URL
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`
-      : `${window.location.origin}/reset-password`;
+    // Construir redirectTo sin doble slash y usando la ruta correcta
+    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+    const redirectTo = `${siteUrl}/reset-password`;
+
+    if (!process.env.NEXT_PUBLIC_SITE_URL) {
+      toast({
+        title: "Advertencia de configuración",
+        description: "La variable NEXT_PUBLIC_SITE_URL no está definida. Usando la URL actual como base.",
+        variant: "default",
+      });
+    }
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo,
     });
@@ -51,17 +60,17 @@ export default function ForgotPasswordPage() {
     setIsLoading(false);
 
     if (error) {
-        toast({
-            title: "Error al recuperar la contraseña",
-            description: error.message,
-            variant: "destructive",
-        });
-        return;
+      toast({
+        title: "Error al recuperar la contraseña",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
     }
 
     toast({
-        title: "Correo de recuperación enviado",
-        description: "Por favor revisa tu correo para restablecer tu contraseña.",
+      title: "Correo de recuperación enviado",
+      description: "Por favor revisa tu correo para restablecer tu contraseña.",
     });
 
     router.push("/login");
