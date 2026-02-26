@@ -25,6 +25,7 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [tokens, setTokens] = useState<{ access_token: string | null; refresh_token: string | null }>({ access_token: null, refresh_token: null });
   const [tokenError, setTokenError] = useState<string | null>(null);
+  const [isCheckingToken, setIsCheckingToken] = useState(true);
 
   // Extraer tokens del hash o query string al montar
   React.useEffect(() => {
@@ -43,10 +44,12 @@ export default function ResetPasswordPage() {
       access_token = access_token || searchParams.get('access_token');
       refresh_token = refresh_token || searchParams.get('refresh_token');
     }
+    console.log('access_token:', access_token, 'refresh_token:', refresh_token);
     if (!access_token || !refresh_token) {
       setTokenError('El enlace de recuperación no es válido o ha expirado.');
     }
     setTokens({ access_token, refresh_token });
+    setIsCheckingToken(false);
   }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -112,9 +115,11 @@ export default function ResetPasswordPage() {
                 Restablecer Contraseña
               </h1>
             </div>
-            {tokenError ? (
+            {isCheckingToken ? (
+              <div className="text-center py-8 text-white">Cargando...</div>
+            ) : tokenError ? (
               <div className="text-red-500 text-center font-semibold py-4">{tokenError}</div>
-            ) : (
+            ) : tokens.access_token && tokens.refresh_token ? (
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
@@ -160,6 +165,8 @@ export default function ResetPasswordPage() {
                   </Button>
                 </form>
               </Form>
+            ) : (
+              <div className="text-center py-8 text-white">Error inesperado: no se detectaron los tokens.</div>
             )}
             <p className="text-center text-sm text-muted-foreground">
               <Link href="/login" className="hover:text-brand underline underline-offset-4">
